@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+echo Running no error
+smack --verifier corral --float --integer-encoding=bit-vector truncf.rs truncf.c
+echo Running bugged
+smack --verifier corral --float --integer-encoding=bit-vector truncf.rs truncf_bugged.c
