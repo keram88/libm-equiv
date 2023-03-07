@@ -1,0 +1,5 @@
+#! /usr/bin/env bash
+
+(time smack --float --unroll 3 --integer-encoding bit-vector --verifier corral -- frexp.rs frexp.c) > cmr.txt 2>&1 &
+(time smack --float --unroll 3 --integer-encoding bit-vector --verifier boogie -- frexp.rs frexp.c) > bmr.txt 2>&1 &
+
