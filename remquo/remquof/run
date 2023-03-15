@@ -1,0 +1,5 @@
+#! /usr/bin/env bash
+
+#(time smack --float --unroll 1 --integer-encoding bit-vector --verifier corral --entry-points musl_rust -- remquof.rs remquof.c) > cmr.txt 2>&1 &
+(time smack --float --unroll 3 --integer-encoding bit-vector --verifier boogie --entry-points musl_rust -- remquof.rs remquof.c) > bmr.txt 2>&1 &
+

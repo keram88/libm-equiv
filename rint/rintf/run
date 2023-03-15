@@ -1,0 +1,9 @@
+#! /usr/bin/env bash
+
+(time smack --float --unroll 1 --integer-encoding bit-vector --verifier corral --entry-points musl_smack -- rintf.rs rintf.c) > cms.txt 2>&1 &
+(time smack --float --unroll 1 --integer-encoding bit-vector --verifier corral --entry-points rust_smack -- rintf.rs rintf.c) > crs.txt 2>&1 &
+(time smack --float --unroll 1 --integer-encoding bit-vector --verifier corral --entry-points musl_rust -- rintf.rs rintf.c) > cmr.txt 2>&1 &
+(time smack --float --unroll 1 --integer-encoding bit-vector --verifier boogie --entry-points musl_smack -- rintf.rs rintf.c) > bms.txt 2>&1 &
+(time smack --float --unroll 1 --integer-encoding bit-vector --verifier boogie --entry-points rust_smack -- rintf.rs rintf.c) > brs.txt 2>&1 &
+(time smack --float --unroll 1 --integer-encoding bit-vector --verifier boogie --entry-points musl_rust -- rintf.rs rintf.c) > bmr.txt 2>&1 &
+

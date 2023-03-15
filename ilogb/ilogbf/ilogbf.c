@@ -12,7 +12,7 @@ int musl_ilogbf(float x)
 	if (!e) {
 		i <<= 9;
 		if (i == 0) {
-			FORCE_EVAL(0/0.0f);
+		  //FORCE_EVAL(0/0.0f);
 			return FP_ILOGB0;
 		}
 		/* subnormal x */
@@ -20,7 +20,7 @@ int musl_ilogbf(float x)
 		return e;
 	}
 	if (e == 0xff) {
-		FORCE_EVAL(0/0.0f);
+	  //FORCE_EVAL(0/0.0f);
 		return i<<9 ? FP_ILOGBNAN : INT_MAX;
 	}
 	return e - 0x7f;

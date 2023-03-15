@@ -25,12 +25,29 @@
  * SUCH DAMAGE.
  */
 
+#[macro_use]
+extern crate smack;
+use smack::*;
+
+extern crate core;
 use core::f32;
 use core::ptr::read_volatile;
 
-use super::fenv::{
-    feclearexcept, fegetround, feraiseexcept, fetestexcept, FE_INEXACT, FE_TONEAREST, FE_UNDERFLOW,
-};
+// use super::fenv::{
+//     feclearexcept, fegetround, feraiseexcept, fetestexcept, FE_INEXACT, FE_TONEAREST, FE_UNDERFLOW,
+// };
+
+
+const FE_TONEAREST: i32 = 0;
+const FE_DOWNWARD : i32 =0x400;
+const FE_UPWARD: i32 =0x800;
+const FE_TOWARDZERO: i32 = 0xc00;
+const FE_INEXACT: i32 = 1;
+
+extern "C" {
+    fn fegetround() -> i32;
+    fn fesetround(x: i32) -> i32;
+}
 
 /*
  * Fused multiply-add: Compute x * y + z with a single rounding error.
@@ -46,7 +63,7 @@ use super::fenv::{
 /// Computes the value (as if) to infinite precision and rounds once to the result format,
 /// according to the rounding mode characterized by the value of FLT_ROUNDS.
 #[cfg_attr(all(test, assert_no_panic), no_panic::no_panic)]
-pub fn fmaf(x: f32, y: f32, mut z: f32) -> f32 {
+pub fn rust_fmaf(x: f32, y: f32, mut z: f32, feexcept: i32) -> f32 {
     let xy: f64;
     let mut result: f64;
     let mut ui: u64;
@@ -65,22 +82,23 @@ pub fn fmaf(x: f32, y: f32, mut z: f32) -> f32 {
         /* exact */
         (result - xy == z as f64 && result - z as f64 == xy) ||
         /* not round-to-nearest */
-        fegetround() != FE_TONEAREST
+        unsafe { fegetround() } != FE_TONEAREST
     {
         /*
             underflow may not be raised correctly, example:
             fmaf(0x1p-120f, 0x1p-120f, 0x1p-149f)
         */
-        if e < 0x3ff - 126 && e >= 0x3ff - 149 && fetestexcept(FE_INEXACT) != 0 {
-            feclearexcept(FE_INEXACT);
+	// if e < 0x3ff - 126 && e >= 0x3ff - 149 && fetestexcept(FE_INEXACT) != 0 {
+	if e < 0x3ff - 126 && e >= 0x3ff - 149 && feexcept == FE_INEXACT {
+            // feclearexcept(FE_INEXACT);
             // prevent `xy + vz` from being CSE'd with `xy + z` above
             let vz: f32 = unsafe { read_volatile(&z) };
             result = xy + vz as f64;
-            if fetestexcept(FE_INEXACT) != 0 {
-                feraiseexcept(FE_UNDERFLOW);
-            } else {
-                feraiseexcept(FE_INEXACT);
-            }
+	    // if fetestexcept(FE_INEXACT) != 0 {
+            //     feraiseexcept(FE_UNDERFLOW);
+            // } else {
+            //     feraiseexcept(FE_INEXACT);
+            // }
         }
         z = result as f32;
         return z;
@@ -104,14 +122,54 @@ pub fn fmaf(x: f32, y: f32, mut z: f32) -> f32 {
     f64::from_bits(ui) as f32
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn issue_263() {
-        let a = f32::from_bits(1266679807);
-        let b = f32::from_bits(1300234242);
-        let c = f32::from_bits(1115553792);
-        let expected = f32::from_bits(1501560833);
-        assert_eq!(super::fmaf(a, b, c), expected);
-    }
+// #[cfg(test)]
+// mod tests {
+//     #[test]
+//     fn issue_263() {
+//         let a = f32::from_bits(1266679807);
+//         let b = f32::from_bits(1300234242);
+//         let c = f32::from_bits(1115553792);
+//         let expected = f32::from_bits(1501560833);
+//         assert_eq!(super::fmaf(a, b, c), expected);
+//     }
+// }
+
+extern "C" {
+    fn musl_fmaf(x: f32, y: f32, z: f32, feexcept: i32) -> f32;
+}
+
+#[no_mangle]
+fn musl_rust() {
+    let x: f32 = 0.0f32.verifier_nondet();
+    let y: f32 = 0.0f32.verifier_nondet();
+    let z: f32 = 0.0f32.verifier_nondet();
+    verifier_assume!(!x.is_nan());
+    verifier_assume!(!y.is_nan());
+    verifier_assume!(!z.is_nan());
+
+    // If x is zero and y is infinite or if x is infinite and y is zero, and z is not a NaN, then NaN is returned and FE_INVALID is raised    
+    verifier_assume!(!(x == 0.0 && y.is_infinite()));
+    verifier_assume!(!(x.is_infinite() && y == 0.0));
+
+    // If x*y is an exact infinity and z is an infinity with the opposite sign, NaN is returned
+    // Inexact
+    verifier_assume!(!(x*y).is_infinite());
+
+    // Rounding mode
+    let rnd: i32 = 0i32.verifier_nondet();
+    // verifier_assume!(rnd == FE_TONEAREST || rnd == FE_DOWNWARD || rnd == FE_UPWARD || rnd == FE_TOWARDZERO);
+    verifier_assume!(rnd == FE_TONEAREST);
+    unsafe { fesetround(rnd) };
+
+    let feexcept: i32 = 0i32.verifier_nondet();
+    // verifier_assume!(feexcept == 0 || feexcept == FE_INEXACT);
+    verifier_assume!(feexcept == 0);
+    
+    let r1 = rust_fmaf(x, y, z, feexcept);
+    let r2 = unsafe { musl_fmaf(y, x, z, feexcept) };
+    verifier_assert!(r1 == r2);
+}
+
+fn main() {
+    musl_rust();
 }

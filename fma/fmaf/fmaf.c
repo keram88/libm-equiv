@@ -29,6 +29,8 @@
 #include <math.h>
 #include <stdint.h>
 
+#define FE_INEXACT 1
+
 /*
  * Fused multiply-add: Compute x * y + z with a single rounding error.
  *
@@ -36,9 +38,9 @@
  * direct double-precision arithmetic suffices, except where double
  * rounding occurs.
  */
-float musl_fmaf(float x, float y, float z)
+float musl_fmaf(float x, float y, float z, int feexcept)
 {
-	#pragma STDC FENV_ACCESS ON
+  //#pragma STDC FENV_ACCESS ON
 	double xy, result;
 	union {double f; uint64_t i;} u;
 	int e;
@@ -58,15 +60,16 @@ float musl_fmaf(float x, float y, float z)
 		fmaf(0x1p-120f, 0x1p-120f, 0x1p-149f)
 		*/
 #if defined(FE_INEXACT) && defined(FE_UNDERFLOW)
-		if (e < 0x3ff-126 && e >= 0x3ff-149 && fetestexcept(FE_INEXACT)) {
-			feclearexcept(FE_INEXACT);
+		/* if (e < 0x3ff-126 && e >= 0x3ff-149 && fetestexcept(FE_INEXACT)) { */
+		if (e < 0x3ff-126 && e >= 0x3ff-149 && feexcept == FE_INEXACT {		  
+		  /* feclearexcept(FE_INEXACT); */
 			/* TODO: gcc and clang bug workaround */
 			volatile float vz = z;
 			result = xy + vz;
-			if (fetestexcept(FE_INEXACT))
-				feraiseexcept(FE_UNDERFLOW);
-			else
-				feraiseexcept(FE_INEXACT);
+			/* if (fetestexcept(FE_INEXACT)) */
+			/* 	feraiseexcept(FE_UNDERFLOW); */
+			/* else */
+			/* 	feraiseexcept(FE_INEXACT); */
 		}
 #endif
 		z = result;
@@ -89,4 +92,5 @@ float musl_fmaf(float x, float y, float z)
 		u.i--;
 	z = u.f;
 	return z;
+
 }

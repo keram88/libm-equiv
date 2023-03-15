@@ -113,7 +113,20 @@ fn rust_smack() {
     verifier_assert!(r1 == r2);
 }
 
+#[no_mangle]
+fn musl_smack() {
+    let x: f64 = 0.0f64.verifier_nondet();
+    let y: f64 = 0.0f64.verifier_nondet();
+    verifier_assume!(!x.is_nan() && !y.is_nan());
+    verifier_assume!(y != 0.0);
+    verifier_assume!(x.is_finite() && y.is_finite());
+    let r1 = unsafe { musl_fmod(x, y) };
+    let r2 = unsafe { fmod(x, y) };
+    verifier_assert!(r1 == r2);
+}
+
 fn main() {
     musl_rust();
     rust_smack();
+    musl_smack();
 }
