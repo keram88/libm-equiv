@@ -68,48 +68,17 @@ def merge(metadata, yamldata):
 
 
 def metadata(file):
-    m = {}
-    # prefix = []
+    m = {
+         "name": os.path.basename(os.path.dirname(file)),
+         "expect": None,
+         "time-limit": 1200,
+         "bv": False,
+         "incremental": False,
+         "smteq": False
+        }
 
-    # for d in path.dirname(file).split('/'):
-    #     prefix += [d]
-    #     yaml_file = path.join(*(prefix + ['config.yml']))
-    #     if path.isfile(yaml_file):
-    #         with open(yaml_file, "r") as f:
-    #             data = yaml.safe_load(f)
-    #             merge(m, data)
-
-    # with open(file, "r") as f:
-    #     for line in f.readlines():
-
-    #         match = re.search(r'@skip', line)
-    #         if match:
-    #             m['skip'] = True
-
-    #         match = re.search(r'@flag (.*)', line)
-    #         if match:
-    #             m['flags'] += shlex.split(match.group(1).strip())
-
-    #         match = re.search(r'@expect (.*)', line)
-    #         if match:
-    #             m['expect'] = match.group(1).strip()
-
-    #         match = re.search(r'@checkbpl (.*)', line)
-    #         if match:
-    #             m['checkbpl'].append(match.group(1).strip())
-
-    #         match = re.search(r'@checkout (.*)', line)
-    #         if match:
-    #             m['checkout'].append(match.group(1).strip())
-
-    # if not m['skip']:
-    #     if 'expect' not in m:
-    #         print(red("WARNING: @expect MISSING IN %s" % file, None))
-    #         m['expect'] = 'verified'
-
-    #     if not m['expect'] in ['verified', 'error', 'timeout', 'unknown']:
-    #         print(red("WARNING: unexpected @expect annotation '%s'" %
-    #                   m['expect'], None))
+    with open(file) as f:
+         m.update(json.load(f))
 
     return m
 
@@ -121,14 +90,12 @@ UNKNOWN = 2
 FAILED = -1
 
 
-def qprocess_test(
+def process_test(
         cmd,
         test,
-        memory,
         verifier,
+        solver,
         expect,
-        checkbpl,
-        checkout,
         log_file):
     """
     This is the worker function for each process. This function process the
@@ -136,8 +103,9 @@ def qprocess_test(
 
     :return: A tuple with the
     """
-    str_result = "{0:>20}\n".format(test)
-    str_result += "{0:>20} {1:>10}    :".format(memory, verifier)
+    # str_result = "{0:>20}\n".format(test)
+    # str_result += "{0:>20} {1:>10}    :".format(verifier, solver)
+    str_result = "{},{},{},".format(test, verifier, solver)
 
     t0 = time.time()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -146,28 +114,10 @@ def qprocess_test(
     elapsed = time.time() - t0
     status = 0
 
-    bplfile = cmd[cmd.index('-bpl') + 1]
-    with open(os.devnull, 'w') as devnull:
-        for f in checkbpl:
-            with open(bplfile) as bpl:
-                checker = subprocess.Popen(
-                    shlex.split(f), stdin=bpl, stdout=devnull, stderr=devnull)
-                checker.wait()
-                status = status or checker.returncode
-
-        for f in checkout:
-            checker = subprocess.Popen(
-                shlex.split(f),
-                stdin=subprocess.PIPE,
-                stdout=devnull,
-                stderr=devnull)
-            checker.communicate(input=out.encode())
-            status = status or checker.returncode
-
     # get the test results
     result = get_result(out + err)
     if result == expect and status == 0:
-        str_result += green('PASSED ', log_file)
+        str_result += 'PASSED,'
     elif result == 'timeout':
         str_result += red('TIMEOUT', log_file)
     elif result == 'unknown':
@@ -175,7 +125,7 @@ def qprocess_test(
     else:
         str_result += red('FAILED ', log_file)
 
-    str_result += '  [%.2fs]' % round(elapsed, 2)
+    str_result += '%.2fs' % round(elapsed, 2)
     return str_result
 
 
@@ -210,10 +160,17 @@ def get_extensions(languages):
 
 
 def get_tests(folder):
-    print(folder)
     pat = path.join(folder, '*/*', "test.json")
     tests = list(glob.glob(pat))
     tests.sort()
+    return tests
+
+def get_sources(test_cfg):
+    folder = os.path.dirname(test_cfg)
+    tests = []
+    for ext in ('*.rs', '*.c'):
+        pat = path.join(folder, ext)
+        tests = tests + list(glob.glob(pat))
     return tests
 
 def get_config(test):
@@ -244,35 +201,22 @@ def main():
         type=int,
         help='''execute regressions using the selected number of threads in
                 parallel''')
+    parser.add_argument(
+        "--output-log",
+        action="store",
+        dest="log_path",
+        type=str,
+        help="sets the output log path. (std out by default)")
 
     args = parser.parse_args()
 
-    # if args.exhaustive:
-    #     args.all_examples = True
-    #     args.all_configs = True
-
     script_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
     tests = get_tests(script_directory)
-    print(tests)
 
     # configure the logging
     log_format = ''
     log_level = logging.DEBUG
 
-    # add more log levels later (if needed)
-    # if args.log_level.upper() == "INFO":
-    #     log_level = logging.INFO
-    # elif args.log_level.upper() == "WARNING":
-    #     log_level = logging.WARNING
-
-    # if the user supplied a log path, write the logs to that file.
-    # otherwise, write the logs to std out.
-    # if args.log_path:
-    #     logging.basicConfig(
-    #         filename=args.log_path,
-    #         format=log_format,
-    #         level=log_level)
-    # else:
     logging.basicConfig(format=log_format, level=log_level)
 
     logging.debug("Creating Pool with '%d' Workers" % args.n_threads)
@@ -287,35 +231,33 @@ def main():
         results = []
         for test in tests:
             # get the meta data for this test
-            # meta = metadata(test)
+            meta = metadata(test)
 
-            # if meta['memory-limit'] > mem_total:
-            #     continue
-
-            # if meta['skip'] is True:
-            #     continue
-
-            # if meta['skip'] is not False and not args.all_examples:
-            #     continue
+            test_files = get_sources(test)
+            # for (verifier, solver) in ...
 
             # build up the subprocess command
-            # cmd = ['smack', test]
-            # cmd += ['--time-limit', str(meta['time-limit'])]
-            # cmd += meta['flags']
+            cmd = ['smack'] + test_files
+            cmd += ['--time-limit', str(meta['time-limit'])]
+            cmd += ['--float']
+            if meta['bv']:
+                cmd += ['--integer-encoding', 'bit-vector']
+            if meta['smteq']:
+                cmd += ['--transform-bpl', './smteq']
 
-            # for memory in meta['memory'][:100 if args.all_configs else 1]:
-            #     cmd += ['--mem-mod=' + memory]
-
-            #     for verifier in (meta['verifiers']
-            #                          [:100 if args.all_configs else 1]):
-            #         name = path.splitext(path.basename(test))[0]
-            #         cmd += ['--verifier=' + verifier]
-            #         cmd += ['-bc', "%s-%s-%s.bc" % (name, memory, verifier)]
-            #         cmd += ['-bpl', "%s-%s-%s.bpl" % (name, memory, verifier)]
+            verifier = 'boogie'
+            solver = 'z3'
+            cmd += ['--verifier', verifier, '--solver', solver]
+            # print(" ".join(cmd))
             r = p.apply_async(
                     process_test,
                     args=(
-                        args.log_path,
+                        cmd[:],
+                        meta['name'],
+                        verifier,
+                        solver,
+                        meta['expect'],
+                        args.log_path
                     ),
                     callback=tally_result)
             results.append(r)
