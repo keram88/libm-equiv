@@ -1,0 +1,7 @@
+{
+    "name": "log2f_fail",
+    "bv": true,
+    "expect": "error",
+    "smteq": true,
+    "incremental": true
+}
