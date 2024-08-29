@@ -1,0 +1,7 @@
+{
+    "name": "ceilf",
+    "bv": true,
+    "expect": "error",
+    "smteq": false,
+    "incremental": false
+}
