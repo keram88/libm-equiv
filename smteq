@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+sed 's/{:builtin "fp.eq"}//g' - | sed 's/function  $foeq./function {:builtin "="} $foeq./g' -

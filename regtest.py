@@ -14,6 +14,7 @@ import glob
 import time
 import sys
 import shlex
+import statistics
 
 # OVERRIDE_FIELDS = ['verifiers', 'memory', 'time-limit', 'memory-limit', 'skip']
 # APPEND_FIELDS = ['flags', 'checkbpl', 'checkout']
@@ -24,6 +25,7 @@ LANGUAGES = {'c': {'*.c'},
              'rust': {'*.rs'},
              'llvm-ir': {"*.ll"}}
 
+CANCELLED = False
 
 def bold(text):
     return '\033[1m' + text + '\033[0m'
@@ -96,36 +98,51 @@ def process_test(
         verifier,
         solver,
         expect,
-        log_file):
+        runs = 1):
     """
     This is the worker function for each process. This function process the
     supplied test and returns a tuple containing  indicating the test results.
 
     :return: A tuple with the
     """
-    # str_result = "{0:>20}\n".format(test)
-    # str_result += "{0:>20} {1:>10}    :".format(verifier, solver)
-    str_result = "{},{},{},".format(test, verifier, solver)
 
-    t0 = time.time()
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                         universal_newlines=True)
-    out, err = p.communicate()
-    elapsed = time.time() - t0
-    status = 0
+    times = []
+    run_result = None
+    for _ in range(runs):
+        t0 = time.time()
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                             universal_newlines=True)
+        out, err = p.communicate()
+        elapsed = time.time() - t0
+        times.append(elapsed)
+        status = 0
 
-    # get the test results
-    result = get_result(out + err)
-    if result == expect and status == 0:
-        str_result += 'PASSED,'
-    elif result == 'timeout':
-        str_result += red('TIMEOUT', log_file)
-    elif result == 'unknown':
-        str_result += red('UNKNOWN', log_file)
-    else:
-        str_result += red('FAILED ', log_file)
+        # get the test results
+        result = get_result(out + err)
+        if result == expect and status == 0:
+            str_result = 'PASSED'
+        elif result == 'timeout':
+            str_result = 'TIMEOUT'
+        elif result == 'unknown':
+            str_result = 'UNKNOWN'
+        else:
+            str_result = 'FAILED'
 
-    str_result += '%.2fs' % round(elapsed, 2)
+        if run_result is None:
+            run_result = str_result
+        elif run_result == "PASSED":
+            if str_result == "TIMEOUT":
+                run_result = "TIMEOUTPASS"
+                break
+        else:
+            run_result = str_result
+            break
+        
+        if CANCELLED:
+            break
+    avg = statistics.mean(times)
+    variance = 0 if len(times) <=1 else statistics.variance(times)
+    str_result = "{},{},{},{},{},{}".format(test, verifier, solver, run_result, avg, variance)
     return str_result
 
 
@@ -202,6 +219,14 @@ def main():
         help='''execute regressions using the selected number of threads in
                 parallel''')
     parser.add_argument(
+        "--runs",
+        action="store",
+        dest="runs",
+        default=1,
+        type=int,
+        help='''Number of times to run each benchmark to compute the
+                average and variance of run-time''')
+    parser.add_argument(
         "--output-log",
         action="store",
         dest="log_path",
@@ -209,7 +234,6 @@ def main():
         help="sets the output log path. (std out by default)")
 
     args = parser.parse_args()
-
     script_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
     tests = get_tests(script_directory)
 
@@ -257,7 +281,7 @@ def main():
                         verifier,
                         solver,
                         meta['expect'],
-                        args.log_path
+                        args.runs
                     ),
                     callback=tally_result)
             results.append(r)
@@ -268,6 +292,7 @@ def main():
 
     except KeyboardInterrupt:
         logging.debug("Caught KeyboardInterrupt, terminating workers")
+        CANCELLED = True
         p.terminate()  # terminate any remaining workers
         p.join()
     else:
