@@ -15,7 +15,7 @@ pub fn rust_fmax(x: f64, y: f64) -> f64 {
     // Since we do not support sNaN in Rust yet, we do not need to handle them.
     // FIXME(nagisa): due to https://bugs.llvm.org/show_bug.cgi?id=33303 we canonicalize by
     // multiplying by 1.0. Should switch to the `canonicalize` when it works.
-    (if x.verifier_is_nan() || x < y { y } else { x }) * 1.0
+    (if x.is_nan() || x < y { y } else { x }) * 1.0
 }
 
 extern "C" {
