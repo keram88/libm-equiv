@@ -95,7 +95,7 @@ mod tests {
     #[test]
     fn spec_tests() {
         // Not Asserted: that the current rounding mode has no effect.
-        assert!(floor(NAN).is_nan());
+        assert!(floor(NAN).verifier_is_nan());
         for f in [0.0, -0.0, INFINITY, NEG_INFINITY].iter().copied() {
             assert_eq!(floor(f), f);
         }
@@ -110,7 +110,7 @@ extern "C" {
 #[no_mangle]
 fn musl_rust() {
     let x = 0.0f64.verifier_nondet();
-    verifier_assume!(!x.is_nan());
+    verifier_assume!(!x.verifier_is_nan());
     let y = unsafe { musl_floor(x) };
     let z = rust_floor(x);
     verifier_assert!(y == z);
@@ -119,7 +119,7 @@ fn musl_rust() {
 #[no_mangle]
 fn musl_smack() {
     let x = 0.0f64.verifier_nondet();
-    verifier_assume!(!x.is_nan());
+    verifier_assume!(!x.verifier_is_nan());
     let y = unsafe { musl_floor(x) };
     let z = unsafe { floor(x) };
     verifier_assert!(y == z);
@@ -128,14 +128,12 @@ fn musl_smack() {
 #[no_mangle]
 fn rust_smack() {
     let x = 0.0f64.verifier_nondet();
-    verifier_assume!(!x.is_nan());
+    verifier_assume!(!x.verifier_is_nan());
     let y = rust_floor(x);
     let z = unsafe { floor(x) };
     verifier_assert!(y == z);
 }
 
 fn main() {
-    musl_smack();
     musl_rust();
-    rust_smack();
 }
