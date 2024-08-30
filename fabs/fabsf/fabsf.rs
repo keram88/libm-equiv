@@ -75,7 +75,7 @@ extern "C" {
 #[no_mangle]
 fn musl_smack() {
     let x = 0.0f32.verifier_nondet();
-    verifier_assume!(!x.is_nan());
+    verifier_assume!(!x.verifier_is_nan());
     let y = unsafe { musl_fabsf(x) };
     let z = unsafe { fabsf(x) };
     verifier_assert!(y == z);
@@ -84,7 +84,7 @@ fn musl_smack() {
 #[no_mangle]
 fn rust_smack() {
     let x = 0.0f32.verifier_nondet();
-    verifier_assume!(!x.is_nan());
+    verifier_assume!(!x.verifier_is_nan());
     let y = rust_fabsf(x);
     let z = unsafe { fabsf(x) };
     verifier_assert!(y == z);
@@ -93,7 +93,7 @@ fn rust_smack() {
 #[no_mangle]
 fn musl_rust() {
     let x = 0.0f32.verifier_nondet();
-    verifier_assume!(!x.is_nan());
+    verifier_assume!(!x.verifier_is_nan());
     let y = unsafe { musl_fabsf(x) };
     let z = rust_fabsf(x);
     verifier_assert!(y == z);

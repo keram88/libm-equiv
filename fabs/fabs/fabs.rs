@@ -53,7 +53,7 @@ pub fn rust_fabs(x: f64) -> f64 {
 //     /// The spec: https://en.cppreference.com/w/cpp/numeric/math/fabs
 //     #[test]
 //     fn spec_tests() {
-//         assert!(fabs(NAN).is_nan());
+//         assert!(fabs(NAN).verifier_is_nan());
 //         for f in [0.0, -0.0].iter().copied() {
 //             assert_eq!(fabs(f), 0.0);
 //         }
@@ -73,7 +73,7 @@ extern "C" {
 #[no_mangle]
 fn musl_smack() {
     let x = 0.0f64.verifier_nondet();
-    verifier_assume!(!x.is_nan());
+    verifier_assume!(!x.verifier_is_nan());
     let y = unsafe { musl_fabs(x) };
     let z = unsafe { fabs(x) };
     verifier_assert!(y == z);
@@ -82,7 +82,7 @@ fn musl_smack() {
 #[no_mangle]
 fn rust_smack() {
     let x = 0.0f64.verifier_nondet();
-    verifier_assume!(!x.is_nan());
+    verifier_assume!(!x.verifier_is_nan());
     let y = rust_fabs(x);
     let z = unsafe { fabs(x) };
     verifier_assert!(y == z);
@@ -91,7 +91,7 @@ fn rust_smack() {
 #[no_mangle]
 fn musl_rust() {
     let x = 0.0f64.verifier_nondet();
-    verifier_assume!(!x.is_nan());
+    verifier_assume!(!x.verifier_is_nan());
     let y = unsafe { musl_fabs(x) };
     let z = rust_fabs(x);
     verifier_assert!(y == z);
