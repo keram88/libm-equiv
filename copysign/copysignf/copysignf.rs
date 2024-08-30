@@ -28,9 +28,9 @@ extern "C" {
 #[no_mangle]
 fn musl_smack() {
     let x1 = 0.0f32.verifier_nondet();
-    verifier_assume!(!x1.is_nan());
+    verifier_assume!(!x1.verifier_is_nan());
     let x2 = 0.0f32.verifier_nondet();
-    verifier_assume!(!x2.is_nan());
+    verifier_assume!(!x2.verifier_is_nan());
     let y = unsafe { musl_copysignf(x1, x2) };
     let z = unsafe { copysignf(x1, x2) };
     verifier_assert!(y == z);
@@ -39,9 +39,9 @@ fn musl_smack() {
 #[no_mangle]
 fn rust_smack() {
     let x1 = 0.0f32.verifier_nondet();
-    verifier_assume!(!x1.is_nan());
+    verifier_assume!(!x1.verifier_is_nan());
     let x2 = 0.0f32.verifier_nondet();
-    verifier_assume!(!x2.is_nan());
+    verifier_assume!(!x2.verifier_is_nan());
     let y = rust_copysignf(x1, x2);
     let z = unsafe { copysignf(x1, x2) };
     verifier_assert!(y == z);
@@ -50,9 +50,9 @@ fn rust_smack() {
 #[no_mangle]
 fn musl_rust() {
     let x1 = 0.0f32.verifier_nondet();
-    verifier_assume!(!x1.is_nan());
+    verifier_assume!(!x1.verifier_is_nan());
     let x2 = 0.0f32.verifier_nondet();
-    verifier_assume!(!x2.is_nan());
+    verifier_assume!(!x2.verifier_is_nan());
     let y = unsafe { musl_copysignf(x1, x2) };
     let z = rust_copysignf(x1, x2);
     verifier_assert!(y == z);
