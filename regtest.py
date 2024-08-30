@@ -177,8 +177,11 @@ def get_extensions(languages):
 
 
 def get_tests(folder):
-    pat = path.join(folder, '*/*', "test.json")
-    tests = list(glob.glob(pat))
+    tests = []
+    for root, dirs, files in os.walk(folder):
+        for file in files:
+            if file == 'test.json':
+                tests.append(os.path.join(root, file))
     tests.sort()
     return tests
 
@@ -249,14 +252,22 @@ def main():
         nargs='*',
         dest="verifiers",
         choices=['boogie-z3', 'boogie-cvc5', 'corral-z3', 'all'],
-        default="boogie-z3",
-
+        default=["boogie-z3"],
+    )
+    parser.add_argument(
+        '--dir',
+        action='store',
+        default=None,
+        dest='dir',
+        type=str
     )
     args = parser.parse_args()
-
-    script_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
+    if args.dir is None:
+        script_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
+    else:
+        script_directory = os.path.abspath(args.dir)
     tests = get_tests(script_directory)
-    # verifiers = get_verifiers(args.verifiers)
+
     verifiers = get_verifiers(args.verifiers)
     # configure the logging
     log_format = ''
@@ -279,9 +290,9 @@ def main():
             meta = metadata(test)
 
             test_files = get_sources(test)
-            # for (verifier, solver) in ...
+
             for verifier, solver in verifiers:
-            # build up the subprocess command
+                # build up the subprocess command
                 cmd = ['smack'] + test_files
                 cmd += ['--time-limit', str(meta['time-limit'])]
                 cmd += ['--float']
