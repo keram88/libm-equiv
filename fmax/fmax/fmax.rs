@@ -15,7 +15,7 @@ pub fn rust_fmax(x: f64, y: f64) -> f64 {
     // Since we do not support sNaN in Rust yet, we do not need to handle them.
     // FIXME(nagisa): due to https://bugs.llvm.org/show_bug.cgi?id=33303 we canonicalize by
     // multiplying by 1.0. Should switch to the `canonicalize` when it works.
-    (if x.is_nan() || x < y { y } else { x }) * 1.0
+    (if x.verifier_is_nan() || x < y { y } else { x }) * 1.0
 }
 
 extern "C" {
@@ -28,9 +28,9 @@ extern "C" {
 #[no_mangle]
 fn musl_smack() {
     let x1 = 0.0f64.verifier_nondet();
-    verifier_assume!(!x1.is_nan());
+    verifier_assume!(!x1.verifier_is_nan());
     let x2 = 0.0f64.verifier_nondet();
-    verifier_assume!(!x2.is_nan());
+    verifier_assume!(!x2.verifier_is_nan());
     let y = unsafe { musl_fmax(x1, x2) };
     let z = unsafe { fmax(x1, x2) };
     verifier_assert!(y == z);
@@ -39,9 +39,9 @@ fn musl_smack() {
 #[no_mangle]
 fn rust_smack() {
     let x1 = 0.0f64.verifier_nondet();
-    verifier_assume!(!x1.is_nan());
+    verifier_assume!(!x1.verifier_is_nan());
     let x2 = 0.0f64.verifier_nondet();
-    verifier_assume!(!x2.is_nan());
+    verifier_assume!(!x2.verifier_is_nan());
     let y = rust_fmax(x1, x2);
     let z = unsafe { fmax(x1, x2) };
     verifier_assert!(y == z);
@@ -50,9 +50,9 @@ fn rust_smack() {
 #[no_mangle]
 fn musl_rust() {
     let x1 = 0.0f64.verifier_nondet();
-    verifier_assume!(!x1.is_nan());
+    verifier_assume!(!x1.verifier_is_nan());
     let x2 = 0.0f64.verifier_nondet();
-    verifier_assume!(!x2.is_nan());
+    verifier_assume!(!x2.verifier_is_nan());
     let y = unsafe { musl_fmax(x1, x2) };
     let z = rust_fmax(x1, x2);
     verifier_assert!(y == z);
