@@ -141,7 +141,7 @@ def process_test(
         if CANCELLED:
             break
     avg = statistics.mean(times)
-    variance = 0 if len(times) <=1 else statistics.variance(times)
+    variance = 0 if len(times) <=1 else statistics.stdev(times)
     str_result = "{},{},{},{},{},{}".format(test, verifier, solver, run_result, avg, variance)
     return str_result
 
@@ -190,6 +190,17 @@ def get_sources(test_cfg):
         tests = tests + list(glob.glob(pat))
     return tests
 
+def get_verifiers(vers):
+    verifiers = set()
+    for ver in vers:
+        if ver in ('boogie-z3', 'all'):
+            verifiers.add(('boogie', 'z3'))
+        if ver in ('boogie-cvc5', 'all'):
+            verifiers.add(('boogie', 'cvc5'))
+        if ver in ('corral', 'all'):
+            verifiers.add(('corral', 'z3'))
+    return verifiers
+
 def get_config(test):
     args = []
     with open(test, 'r') as f:
@@ -232,11 +243,21 @@ def main():
         dest="log_path",
         type=str,
         help="sets the output log path. (std out by default)")
+    parser.add_argument(
+        "--verifiers",
+        action='store',
+        nargs='*',
+        dest="verifiers",
+        choices=['boogie-z3', 'boogie-cvc5', 'corral-z3', 'all'],
+        default="boogie-z3",
 
+    )
     args = parser.parse_args()
+
     script_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
     tests = get_tests(script_directory)
-
+    # verifiers = get_verifiers(args.verifiers)
+    verifiers = get_verifiers(args.verifiers)
     # configure the logging
     log_format = ''
     log_level = logging.DEBUG
@@ -259,32 +280,30 @@ def main():
 
             test_files = get_sources(test)
             # for (verifier, solver) in ...
-
+            for verifier, solver in verifiers:
             # build up the subprocess command
-            cmd = ['smack'] + test_files
-            cmd += ['--time-limit', str(meta['time-limit'])]
-            cmd += ['--float']
-            if meta['bv']:
-                cmd += ['--integer-encoding', 'bit-vector']
-            if meta['smteq']:
-                cmd += ['--transform-bpl', './smteq']
+                cmd = ['smack'] + test_files
+                cmd += ['--time-limit', str(meta['time-limit'])]
+                cmd += ['--float']
+                if meta['bv']:
+                    cmd += ['--integer-encoding', 'bit-vector']
+                if meta['smteq']:
+                    cmd += ['--transform-bpl', './smteq']
 
-            verifier = 'boogie'
-            solver = 'z3'
-            cmd += ['--verifier', verifier, '--solver', solver]
-            # print(" ".join(cmd))
-            r = p.apply_async(
-                    process_test,
-                    args=(
-                        cmd[:],
-                        meta['name'],
-                        verifier,
-                        solver,
-                        meta['expect'],
-                        args.runs
-                    ),
-                    callback=tally_result)
-            results.append(r)
+                cmd += ['--verifier', verifier, '--solver', solver]
+                # print(" ".join(cmd))
+                r = p.apply_async(
+                        process_test,
+                        args=(
+                            cmd[:],
+                            meta['name'],
+                            verifier,
+                            solver,
+                            meta['expect'],
+                            args.runs
+                        ),
+                        callback=tally_result)
+                results.append(r)
 
         # keep the main thread active while there are active workers
         for r in results:
