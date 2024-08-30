@@ -16,9 +16,9 @@ use core::f64;
 /// A range error may occur.
 #[cfg_attr(all(test, assert_no_panic), no_panic::no_panic)]
 pub fn rust_fdim(x: f64, y: f64) -> f64 {
-    if x.is_nan() {
+    if x.verifier_is_nan() {
         x
-    } else if y.is_nan() {
+    } else if y.verifier_is_nan() {
         y
     } else if x > y {
         x - y
@@ -37,9 +37,9 @@ extern "C" {
 #[no_mangle]
 fn musl_smack() {
     let x1 = 0.0f64.verifier_nondet();
-    verifier_assume!(!x1.is_nan());
+    verifier_assume!(!x1.verifier_is_nan());
     let x2 = 0.0f64.verifier_nondet();
-    verifier_assume!(!x2.is_nan());
+    verifier_assume!(!x2.verifier_is_nan());
     let y = unsafe { musl_fdim(x1, x2) };
     let z = unsafe { fdim(x1, x2) };
     verifier_assert!(y == z);
@@ -48,9 +48,9 @@ fn musl_smack() {
 #[no_mangle]
 fn rust_smack() {
     let x1 = 0.0f64.verifier_nondet();
-    verifier_assume!(!x1.is_nan());
+    verifier_assume!(!x1.verifier_is_nan());
     let x2 = 0.0f64.verifier_nondet();
-    verifier_assume!(!x2.is_nan());
+    verifier_assume!(!x2.verifier_is_nan());
     let y = rust_fdim(x1, x2);
     let z = unsafe { fdim(x1, x2) };
     verifier_assert!(y == z);
@@ -59,9 +59,9 @@ fn rust_smack() {
 #[no_mangle]
 fn musl_rust() {
     let x1 = 0.0f64.verifier_nondet();
-    verifier_assume!(!x1.is_nan());
+    verifier_assume!(!x1.verifier_is_nan());
     let x2 = 0.0f64.verifier_nondet();
-    verifier_assume!(!x2.is_nan());
+    verifier_assume!(!x2.verifier_is_nan());
     let y = unsafe { musl_fdim(x1, x2) };
     let z = rust_fdim(x1, x2);
     verifier_assert!(y == z);
