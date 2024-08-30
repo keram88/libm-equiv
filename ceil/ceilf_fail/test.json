@@ -1,5 +1,4 @@
 {
-    "name": "ceilf_fail",
     "bv": true,
     "expect": "error",
     "smteq": false,
