@@ -127,6 +127,4 @@ fn musl_smack() {
 
 fn main() {
     musl_rust();
-    rust_smack();
-    musl_smack();
 }

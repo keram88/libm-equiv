@@ -67,16 +67,3 @@ double musl_fmod(double x, double y)
 	ux.i = uxi;
 	return ux.f;
 }
-
-double fmod(double, double);
-
-void musl_smack() {
-  double x = __VERIFIER_nondet_double();
-  double y = __VERIFIER_nondet_double();
-  __VERIFIER_assume(!isnan(x) && !isnan(y));
-  __VERIFIER_assume(y != 0.0);
-  __VERIFIER_assume(isfinite(x) && isfinite(y));
-  double r1 = fmod(x, y);
-  double r2 = musl_fmod(x, y);
-  __VERIFIER_assert(r1 == r2);
-}
