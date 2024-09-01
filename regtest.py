@@ -264,8 +264,7 @@ def main():
         action='store',
         default=None,
         dest='dir',
-        type=str,
-        nargs='+'
+        type=str
     )
     args = parser.parse_args()
     if args.dir is None:
