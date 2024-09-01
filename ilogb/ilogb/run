@@ -1,6 +1,0 @@
-#! /usr/bin/env bash
-
-(time smack --float --unroll 1 --integer-encoding bit-vector --verifier boogie --entry-points musl_rust -- ilogb.rs ilogb.c) > bmr.txt 2>&1 &
-(time smack --float --unroll 1 --integer-encoding bit-vector --verifier corral --entry-points musl_rust -- ilogb.rs ilogb.c) > cmr.txt 2>&1 &
-
-
