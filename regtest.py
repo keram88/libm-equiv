@@ -144,8 +144,8 @@ def process_test(
         if CANCELLED:
             break
     avg = statistics.mean(times)
-    variance = 0 if len(times) <=1 else statistics.stdev(times)
-    str_result = "{},{},{},{},{},{}".format(test, verifier, solver, run_result, avg, variance)
+    stddev = 0 if len(times) <=1 else statistics.stdev(times)
+    str_result = "{},{},{},{},{},{}".format(test, verifier, solver, run_result, avg, stddev)
     return str_result
 
 
@@ -158,7 +158,8 @@ def tally_result(result):
     thread.
     """
     # log the info
-    logging.info(result)
+    print(result)
+    # logging.info(result)
 
     global passed, failed, timeouts, unknowns, verified
     if "VERIFIED" in result:
@@ -266,6 +267,13 @@ def main():
         dest='dir',
         type=str
     )
+    parser.add_argument(
+        '--entry-point',
+        action='store',
+        default=None,
+        dest='entry_point',
+        type=str
+    )
     args = parser.parse_args()
     if args.dir is None:
         script_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -283,12 +291,16 @@ def main():
     logging.debug("Creating Pool with '%d' Workers" % args.n_threads)
     p = ThreadPool(processes=args.n_threads)
 
+    header = "Function Name,Verifier,Solver,Status,Time,StdDev"
+    if args.entry_point is not None:
+        header += "," + args.entry_point
+    # logging.info(header)
+    print(header)
     try:
         # start the tests
         logging.info("Running regression tests...")
 
         # start processing the tests.
-
         results = []
         for test in tests:
             # get the meta data for this test
@@ -305,6 +317,8 @@ def main():
                     cmd += ['--integer-encoding', 'bit-vector']
                 if meta['smteq']:
                     cmd += ['--transform-bpl', './smteq']
+                if args.entry_point is not None:
+                    cmd += ['--entry-points', args.entry_point]
 
                 cmd += ['--verifier', verifier, '--solver', solver]
                 # print(" ".join(cmd))
