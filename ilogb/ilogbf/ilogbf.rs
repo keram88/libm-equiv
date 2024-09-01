@@ -57,28 +57,28 @@ pub fn rust_ilogbf(x: f32) -> i32 {
 
 extern "C" {
     // Smack
-    // fn ilogbf(x: f32) -> i32;
+    fn ilogbf(x: f32) -> i32;
     // Musl
     fn musl_ilogbf(x: f32) -> i32;
 }
 
-// #[no_mangle]
-// fn musl_smack() {
-//     let x = 0.0f32.verifier_nondet();
-//     verifier_assume!(!x.is_nan());
-//     let y = unsafe { musl_ilogbf(x) };
-//     let z = unsafe { ilogbf(x) };
-//     verifier_assert!(y == z);
-// }
+#[no_mangle]
+fn musl_smack() {
+    let x = 0.0f32.verifier_nondet();
+    verifier_assume!(!x.is_nan());
+    let y = unsafe { musl_ilogbf(x) };
+    let z = unsafe { ilogbf(x) };
+    verifier_assert!(y == z);
+}
 
-// #[no_mangle]
-// fn rust_smack() {
-//     let x = 0.0f32.verifier_nondet();
-//     verifier_assume!(!x.is_nan());
-//     let y = rust_ilogbf(x);
-//     let z = unsafe { ilogbf(x) };
-//     verifier_assert!(y == z);
-// }
+#[no_mangle]
+fn rust_smack() {
+    let x = 0.0f32.verifier_nondet();
+    verifier_assume!(!x.is_nan());
+    let y = rust_ilogbf(x);
+    let z = unsafe { ilogbf(x) };
+    verifier_assert!(y == z);
+}
 
 #[no_mangle]
 fn musl_rust() {
@@ -90,7 +90,5 @@ fn musl_rust() {
 }
 
 fn main() {
-//    musl_smack();
-//    rust_smack();
     musl_rust();
 }
