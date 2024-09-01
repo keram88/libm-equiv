@@ -1,0 +1,6 @@
+{
+    "bv": true,
+    "expect": "error",
+    "smteq": true,
+    "incremental": false
+}
