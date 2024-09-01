@@ -1,5 +1,0 @@
-#! /usr/bin/env bash
-
-(time smack --float --unroll 3 --integer-encoding bit-vector --verifier corral -- frexpf.rs frexpf.c) > cmr.txt 2>&1 &
-(time smack --float --unroll 3 --integer-encoding bit-vector --verifier boogie -- frexpf.rs frexpf.c) > bmr.txt 2>&1 &
-
