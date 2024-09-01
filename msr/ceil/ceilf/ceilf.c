@@ -1,4 +1,5 @@
 #include "../../../internal/libm.h"
+#include <math.h>
 
 float musl_ceilf(float x)
 {

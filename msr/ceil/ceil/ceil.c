@@ -1,4 +1,5 @@
 #include "../../../include/libm.h"
+#include <math.h>
 
 #if FLT_EVAL_METHOD==0 || FLT_EVAL_METHOD==1
 #define EPS DBL_EPSILON

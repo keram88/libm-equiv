@@ -18,7 +18,7 @@ const TOINT: f64 = 1. / f64::EPSILON;
 ///
 /// Finds the nearest integer greater than or equal to `x`.
 #[cfg_attr(all(test, assert_no_panic), no_panic::no_panic)]
-pub fn ceil(x: f64) -> f64 {
+pub fn rust_ceil(x: f64) -> f64 {
     // On wasm32 we know that LLVM's intrinsic will compile to an optimized
     // `f64.ceil` native instruction, so we can leverage this for both code size
     // and speed.
@@ -71,15 +71,36 @@ pub fn ceil(x: f64) -> f64 {
 }
 
 extern "C" {
+    fn ceil(x: f64) -> f64;
     fn musl_ceil(x: f64) -> f64;
 }
 
-fn main() {
+#[no_mangle]
+fn musl_rust() {
     let x = 0.0f64.verifier_nondet();
     let musl_res = unsafe { musl_ceil(x) };
-    let rust_res = ceil(x);
-    verifier_assume!(!rust_res.verifier_is_nan());
+    let rust_res = rust_ceil(x);
     verifier_assert!(musl_res == rust_res);
+}
+
+#[no_mangle]
+fn rust_smack() {
+    let x = 0.0f64.verifier_nondet();
+    let rust_res = rust_ceil(x);
+    let smack_res = unsafe{ ceil(x) };
+    verifier_assert!(smack_res == rust_res);
+}
+
+#[no_mangle]
+fn musl_smack() {
+    let x = 0.0f64.verifier_nondet();
+    let musl_res = unsafe { musl_ceil(x) };
+    let smack_res = unsafe { ceil(x) };
+    verifier_assert!(musl_res == smack_res);
+}
+
+fn main() {
+    musl_rust();
 }
 
 // #[cfg(test)]
