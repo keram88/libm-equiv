@@ -120,7 +120,10 @@ def process_test(
         # get the test results
         result = get_result(out + err)
         if result == expect and status == 0:
-            str_result = 'PASSED'
+            if expect == 'verified':
+                str_result = 'VERIFIED'
+            else:
+                str_result = 'PASSED'
         elif result == 'timeout':
             str_result = 'TIMEOUT'
         elif result == 'unknown':
@@ -146,7 +149,7 @@ def process_test(
     return str_result
 
 
-passed = failed = timeouts = unknowns = 0
+verified = passed = failed = timeouts = unknowns = 0
 
 
 def tally_result(result):
@@ -157,7 +160,9 @@ def tally_result(result):
     # log the info
     logging.info(result)
 
-    global passed, failed, timeouts, unknowns
+    global passed, failed, timeouts, unknowns, verified
+    if "VERIFIED" in result:
+        verified += 1
     if "PASSED" in result:
         passed += 1
     elif "FAILED" in result:
@@ -259,7 +264,8 @@ def main():
         action='store',
         default=None,
         dest='dir',
-        type=str
+        type=str,
+        nargs='+'
     )
     args = parser.parse_args()
     if args.dir is None:
@@ -336,6 +342,7 @@ def main():
     logging.info(' ELAPSED TIME [%.2fs]' % round(elapsed_time, 2))
 
     # log the test results
+    logging.info(' VERIFIED count: %d' % verified)
     logging.info(' PASSED count: %d' % passed)
     logging.info(' FAILED count: %d' % failed)
     logging.info(' TIMEOUT count: %d' % timeouts)
