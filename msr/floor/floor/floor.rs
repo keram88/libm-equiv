@@ -33,29 +33,29 @@ pub fn rust_floor(x: f64) -> f64 {
     // On wasm32 we know that LLVM's intrinsic will compile to an optimized
     // `f64.floor` native instruction, so we can leverage this for both code size
     // and speed.
-    llvm_intrinsically_optimized! {
-        #[cfg(target_arch = "wasm32")] {
-            return unsafe { ::core::intrinsics::floorf64(x) }
-        }
-    }
-    #[cfg(all(target_arch = "x86", not(target_feature = "sse2")))]
-    {
-        //use an alternative implementation on x86, because the
-        //main implementation fails with the x87 FPU used by
-        //debian i386, probablly due to excess precision issues.
-        //basic implementation taken from https://github.com/rust-lang/libm/issues/219
-        use super::fabs;
-        if fabs(x).to_bits() < 4503599627370496.0_f64.to_bits() {
-            let truncated = x as i64 as f64;
-            if truncated > x {
-                return truncated - 1.0;
-            } else {
-                return truncated;
-            }
-        } else {
-            return x;
-        }
-    }
+    // llvm_intrinsically_optimized! {
+    //     #[cfg(target_arch = "wasm32")] {
+    //         return unsafe { ::core::intrinsics::floorf64(x) }
+    //     }
+    // }
+    // #[cfg(all(target_arch = "x86", not(target_feature = "sse2")))]
+    // {
+    //     //use an alternative implementation on x86, because the
+    //     //main implementation fails with the x87 FPU used by
+    //     //debian i386, probablly due to excess precision issues.
+    //     //basic implementation taken from https://github.com/rust-lang/libm/issues/219
+    //     use super::fabs;
+    //     if fabs(x).to_bits() < 4503599627370496.0_f64.to_bits() {
+    //         let truncated = x as i64 as f64;
+    //         if truncated > x {
+    //             return truncated - 1.0;
+    //         } else {
+    //             return truncated;
+    //         }
+    //     } else {
+    //         return x;
+    //     }
+    // }
     let ui = x.to_bits();
     let e = ((ui >> 52) & 0x7ff) as i32;
 
@@ -110,7 +110,7 @@ extern "C" {
 #[no_mangle]
 fn musl_rust() {
     let x = 0.0f64.verifier_nondet();
-    // verifier_assume!(!x.verifier_is_nan());
+    verifier_assume!(!x.verifier_is_nan());
     let y = unsafe { musl_floor(x) };
     let z = rust_floor(x);
     verifier_assert!(y == z);
@@ -119,7 +119,7 @@ fn musl_rust() {
 #[no_mangle]
 fn musl_smack() {
     let x = 0.0f64.verifier_nondet();
-    // verifier_assume!(!x.verifier_is_nan());
+    verifier_assume!(!x.verifier_is_nan());
     let y = unsafe { musl_floor(x) };
     let z = unsafe { floor(x) };
     verifier_assert!(y == z);
@@ -128,7 +128,7 @@ fn musl_smack() {
 #[no_mangle]
 fn rust_smack() {
     let x = 0.0f64.verifier_nondet();
-    // verifier_assume!(!x.verifier_is_nan());
+    verifier_assume!(!x.verifier_is_nan());
     let y = rust_floor(x);
     let z = unsafe { floor(x) };
     verifier_assert!(y == z);

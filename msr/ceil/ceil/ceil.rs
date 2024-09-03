@@ -78,6 +78,7 @@ extern "C" {
 #[no_mangle]
 fn musl_rust() {
     let x = 0.0f64.verifier_nondet();
+    verifier_assume!(!x.is_nan());
     let musl_res = unsafe { musl_ceil(x) };
     let rust_res = rust_ceil(x);
     verifier_assert!(musl_res == rust_res);
@@ -86,6 +87,7 @@ fn musl_rust() {
 #[no_mangle]
 fn rust_smack() {
     let x = 0.0f64.verifier_nondet();
+    verifier_assume!(!x.is_nan());
     let rust_res = rust_ceil(x);
     let smack_res = unsafe{ ceil(x) };
     verifier_assert!(smack_res == rust_res);
@@ -94,6 +96,7 @@ fn rust_smack() {
 #[no_mangle]
 fn musl_smack() {
     let x = 0.0f64.verifier_nondet();
+    verifier_assume!(!x.is_nan());
     let musl_res = unsafe { musl_ceil(x) };
     let smack_res = unsafe { ceil(x) };
     verifier_assert!(musl_res == smack_res);

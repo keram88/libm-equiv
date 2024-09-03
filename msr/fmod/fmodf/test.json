@@ -1,6 +1,6 @@
 {
     "bv": true,
     "expect": "verified",
-    "smteq": true,
+    "smteq": false,
     "incremental": false
 }
