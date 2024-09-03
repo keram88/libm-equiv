@@ -1,6 +1,6 @@
-#include <math.h>
 #include <stdint.h>
 #include "smack.h"
+#include <math.h>
 
 float musl_fmodf(float x, float y)
 {
