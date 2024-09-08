@@ -1,0 +1,7 @@
+{
+    "bv": true,
+    "expect": "verified",
+    "smteq": false,
+    "incremental": true,
+    "time-limit": 2000
+}
