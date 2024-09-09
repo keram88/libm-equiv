@@ -1,5 +1,4 @@
 {
-    "name": "log2f",
     "bv": true,
     "expect": "verified",
     "smteq": false,

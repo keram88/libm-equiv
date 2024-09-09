@@ -1,4 +1,4 @@
-/* origin: FreeBSD /usr/src/lib/msun/src/e_log2f.c */
+/* origin: FreeBSD /usr/src/lib/msun/src/e_log10f.c */
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -10,8 +10,9 @@
  * ====================================================
  */
 /*
- * See comments in log2.c.
+ * See comments in log10.c.
  */
+
 #[macro_use]
 extern crate smack;
 use smack::*;
@@ -19,8 +20,10 @@ use smack::*;
 extern crate core;
 use core::f32;
 
-const IVLN2HI: f32 = 1.4428710938e+00; /* 0x3fb8b000 */
-const IVLN2LO: f32 = -1.7605285393e-04; /* 0xb9389ad4 */
+const IVLN10HI: f32 = 4.3432617188e-01; /* 0x3ede6000 */
+const IVLN10LO: f32 = -3.1689971365e-05; /* 0xb804ead9 */
+const LOG10_2HI: f32 = 3.0102920532e-01; /* 0x3e9a2080 */
+const LOG10_2LO: f32 = 7.9034151668e-07; /* 0x355427db */
 /* |(log(1+s)-log(1-s))/s - Lg(s)| < 2**-34.24 (~[-4.95e-11, 4.97e-11]). */
 const LG1: f32 = 0.66666662693; /* 0xaaaaaa.0p-24 */
 const LG2: f32 = 0.40000972152; /* 0xccce13.0p-25 */
@@ -28,7 +31,7 @@ const LG3: f32 = 0.28498786688; /* 0x91e9ee.0p-25 */
 const LG4: f32 = 0.24279078841; /* 0xf89e26.0p-26 */
 
 #[cfg_attr(all(test, assert_no_panic), no_panic::no_panic)]
-pub fn log2f(mut x: f32) -> f32 {
+pub fn log10f(mut x: f32) -> f32 {
     let x1p25f = f32::from_bits(0x4c000000); // 0x1p25f === 2 ^ 25
 
     let mut ui: u32 = x.to_bits();
@@ -40,6 +43,7 @@ pub fn log2f(mut x: f32) -> f32 {
     let w: f32;
     let t1: f32;
     let t2: f32;
+    let dk: f32;
     let mut hi: f32;
     let lo: f32;
     let mut ix: u32;
@@ -73,7 +77,6 @@ pub fn log2f(mut x: f32) -> f32 {
     ui = ix;
     x = f32::from_bits(ui);
     verifier_equiv_check_f32(x, 0);
-
     f = x - 1.0;
     s = f / (2.0 + f);
     z = s * s;
@@ -83,26 +86,29 @@ pub fn log2f(mut x: f32) -> f32 {
     t2 = z * (LG1 + w * LG3);
     r = t2 + t1;
     hfsq = 0.5 * f * f;
-    verifier_equiv_check_f32(hfsq, 3);
+    verifier_equiv_check_f32(hfsq, 4);
 
     hi = f - hfsq;
+    verifier_equiv_check_f32(hi, 5);
     ui = hi.to_bits();
     ui &= 0xfffff000;
     hi = f32::from_bits(ui);
-    verifier_equiv_check_f32(hi, 4);
+    verifier_equiv_check_f32(hi, 6);
     lo = f - hi - hfsq + s * (hfsq + r);
-    verifier_equiv_check_f32(lo, 5);
-    verifier_equiv_check_f32((lo + hi) * IVLN2LO + lo * IVLN2HI + hi * IVLN2HI + k as f32, 2);
-    (lo + hi) * IVLN2LO + lo * IVLN2HI + hi * IVLN2HI + k as f32
+    verifier_equiv_check_f32(lo, 3);
+    dk = k as f32;
+    verifier_equiv_check_f32(dk * LOG10_2LO + (lo + hi) * IVLN10LO + lo * IVLN10HI + hi * IVLN10HI + dk * LOG10_2HI, 2);
+    dk * LOG10_2LO + (lo + hi) * IVLN10LO + lo * IVLN10HI + hi * IVLN10HI + dk * LOG10_2HI
 }
 
 extern "C" {
-    fn musl_log2f(x: f32) -> f32;
+    fn musl_log10f(x: f32) -> f32;
 }
+
 fn main() {
     let x = 0.0f32.verifier_nondet();
     verifier_assume!(x >= 0.0);
-    let musl_res = unsafe { musl_log2f(x) };
-    let rust_res = log2f(x);
+    let musl_res = unsafe { musl_log10f(x) };
+    let rust_res = log10f(x);
     verifier_assert!(musl_res == rust_res);
 }

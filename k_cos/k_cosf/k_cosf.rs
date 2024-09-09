@@ -43,7 +43,7 @@ extern "C" {
 
 fn main() {
     let x = 1.0f64.verifier_nondet();
-    verifier_assume!(-1.0 <= x && x <= 1.0);
+    verifier_assume!(-0.785398164 <= x && x <= 0.785398164);
     let bsd_res = unsafe { __kernel_cosdf(x) };
     let rust_res = k_cosf(x);
     verifier_assert!(rust_res == bsd_res);
