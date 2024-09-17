@@ -1,4 +1,7 @@
-/* origin: FreeBSD /usr/src/lib/msun/src/e_log2f.c */
+/* origin: FreeBSD /usr/src/lib/msun/src/e_logf.c */
+/*
+ * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
+ */
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -9,42 +12,45 @@
  * is preserved.
  * ====================================================
  */
-/*
- * See comments in log2.c.
- */
 
-#include "smack.h"
-#include "../../include/math.h"
+#include "../../../include/libm.h"
 #include <stdint.h>
+#include "smack.h"
 
 static const float
-ivln2hi =  1.4428710938e+00, /* 0x3fb8b000 */
-ivln2lo = -1.7605285393e-04, /* 0xb9389ad4 */
+ln2_hi = 6.9313812256e-01, /* 0x3f317180 */
+ln2_lo = 9.0580006145e-06, /* 0x3717f7d1 */
 /* |(log(1+s)-log(1-s))/s - Lg(s)| < 2**-34.24 (~[-4.95e-11, 4.97e-11]). */
 Lg1 = 0xaaaaaa.0p-24, /* 0.66666662693 */
 Lg2 = 0xccce13.0p-25, /* 0.40000972152 */
 Lg3 = 0x91e9ee.0p-25, /* 0.28498786688 */
 Lg4 = 0xf89e26.0p-26; /* 0.24279078841 */
 
-float musl_log2f(float x)
+float bsd_logf(float x)
 {
 	union {float f; uint32_t i;} u = {x};
-	float_t hfsq,f,s,z,R,w,t1,t2,hi,lo;
+	float_t hfsq,f,s,z,R,w,t1,t2,dk;
 	uint32_t ix;
 	int k;
 
 	ix = u.i;
+	__VERIFIER_equiv_store_unsigned_int(ix, 0);
 	k = 0;
 	if (ix < 0x00800000 || ix>>31) {  /* x < 2**-126  */
-		if (ix<<1 == 0)
+		if (ix<<1 == 0) {
+			__VERIFIER_equiv_store_float(-1/(x*x), 1);
 			return -1/(x*x);  /* log(+-0)=-inf */
-		if (ix>>31)
+		}
+		if (ix>>31) {
+			__VERIFIER_equiv_store_float((x-x)/0.0f, 2);
 			return (x-x)/0.0f; /* log(-#) = NaN */
+		}
 		/* subnormal number, scale up x */
 		k -= 25;
 		x *= 0x1p25f;
 		u.f = x;
 		ix = u.i;
+		__VERIFIER_equiv_store_unsigned_int(ix, 3);
 	} else if (ix >= 0x7f800000) {
 		return x;
 	} else if (ix == 0x3f800000)
@@ -56,27 +62,18 @@ float musl_log2f(float x)
 	ix = (ix&0x007fffff) + 0x3f3504f3;
 	u.i = ix;
 	x = u.f;
-	__VERIFIER_equiv_store_float(x, 0);
+	__VERIFIER_equiv_store_float(x, 4);
 
 	f = x - 1.0f;
 	s = f/(2.0f + f);
 	z = s*s;
 	w = z*z;
-	__VERIFIER_equiv_store_float(w, 1);
-
+	__VERIFIER_equiv_store_float(w, 6);
 	t1= w*(Lg2+w*Lg4);
 	t2= z*(Lg1+w*Lg3);
 	R = t2 + t1;
 	hfsq = 0.5f*f*f;
-	__VERIFIER_equiv_store_float(hfsq, 3); // B/Z3: 4m25s
-
-	hi = f - hfsq;
-	u.f = hi;
-	u.i &= 0xfffff000;
-	hi = u.f;
-	__VERIFIER_equiv_store_float(hi, 4);
-	lo = f - hi - hfsq + s*(hfsq+R);
-	__VERIFIER_equiv_store_float(lo, 5);
-	__VERIFIER_equiv_store_float((lo+hi)*ivln2lo + lo*ivln2hi + hi*ivln2hi + k, 2);
-	return (lo+hi)*ivln2lo + lo*ivln2hi + hi*ivln2hi + k;
+	dk = k;
+	__VERIFIER_equiv_store_float(s*(hfsq+R) + dk*ln2_lo - hfsq + f + dk*ln2_hi, 5);
+	return s*(hfsq+R) + dk*ln2_lo - hfsq + f + dk*ln2_hi;
 }

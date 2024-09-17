@@ -59,7 +59,7 @@
  * compiler will convert from decimal to binary accurately enough
  * to produce the hexadecimal values shown.
  */
-#include "../../include/math.h"
+#include "../../../include/libm.h"
 //#include <math.h>
 #include <stdint.h>
 #include "smack.h"

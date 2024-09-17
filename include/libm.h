@@ -20,6 +20,7 @@
 #include <endian.h>
 
 typedef double double_t;
+typedef float float_t;
 
 #if LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024
 #elif LDBL_MANT_DIG == 64 && LDBL_MAX_EXP == 16384 && __BYTE_ORDER == __LITTLE_ENDIAN

@@ -13,9 +13,9 @@
  * ====================================================
  */
 
-#include "../../include/libm.h"
+#include "../../../include/libm.h"
 #include "smack.h"
-#include "../../libmfuns.h"
+#include "../../../libmfuns.h"
 typedef float float_t;
 
 static const float

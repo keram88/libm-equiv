@@ -19,7 +19,7 @@
 
 #include "smack.h"
 #include "math.h"
-#include "../../include/bsd/math_private.h"
+#include "../../../include/bsd/math_private.h"
 
 /* |tan(x)/x - t(x)| < 2**-25.5 (~[-2e-08, 2e-08]). */
 static const double
