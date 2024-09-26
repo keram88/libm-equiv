@@ -76,7 +76,8 @@ def metadata(file):
          "time-limit": 1200,
          "bv": False,
          "incremental": False,
-         "smteq": False
+         "smteq": False,
+         "unroll": 1
         }
 
     with open(file) as f:
@@ -133,6 +134,8 @@ def process_test(
 
         if run_result is None:
             run_result = str_result
+            if str_result != "PASSED":
+                break
         elif run_result == "PASSED":
             if str_result == "TIMEOUT":
                 run_result = "TIMEOUTPASS"
@@ -312,11 +315,10 @@ def main():
                 # build up the subprocess command
                 cmd = ['smack'] + test_files
                 cmd += ['--time-limit', str(meta['time-limit'])]
+                cmd += ['--unroll', str(meta['unroll'])]
                 cmd += ['--float']
                 if meta['bv']:
                     cmd += ['--integer-encoding', 'bit-vector']
-                if meta['smteq']:
-                    cmd += ['--transform-bpl', './smteq']
                 if args.entry_point is not None:
                     cmd += ['--entry-points', args.entry_point]
 
