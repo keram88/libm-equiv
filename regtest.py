@@ -209,7 +209,7 @@ def get_verifiers(vers):
             verifiers.add(('boogie', 'z3'))
         if ver in ('boogie-cvc5', 'all'):
             verifiers.add(('boogie', 'cvc5'))
-        if ver in ('corral', 'all'):
+        if ver in ('corral-z3', 'all'):
             verifiers.add(('corral', 'z3'))
     return verifiers
 
