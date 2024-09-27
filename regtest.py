@@ -134,7 +134,7 @@ def process_test(
 
         if run_result is None:
             run_result = str_result
-            if str_result != "PASSED":
+            if str_result not in ('PASSED', 'VERIFIED'):
                 break
         elif run_result == "PASSED":
             if str_result == "TIMEOUT":
