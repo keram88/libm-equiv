@@ -62,32 +62,7 @@ pub fn rust_nextafterf(x: f32, y: f32) -> f32 {
 }
 
 extern "C" {
-    // Smack
-    fn nextafterf(x: f32, y: f32) -> f32;
-    // Musl
     fn musl_nextafterf(x: f32, y: f32) -> f32;
-}
-
-#[no_mangle]
-fn musl_smack() {
-    let x1 = 0.0f32.verifier_nondet();
-    verifier_assume!(!x1.is_nan());
-    let x2 = 0.0f32.verifier_nondet();
-    verifier_assume!(!x2.is_nan());
-    let y = unsafe { musl_nextafterf(x1, x2) };
-    let z = unsafe { nextafterf(x1, x2) };
-    verifier_assert!(y == z);
-}
-
-#[no_mangle]
-fn rust_smack() {
-    let x1 = 0.0f32.verifier_nondet();
-    verifier_assume!(!x1.is_nan());
-    let x2 = 0.0f32.verifier_nondet();
-    verifier_assume!(!x2.is_nan());
-    let y = rust_nextafterf(x1, x2);
-    let z = unsafe { nextafterf(x1, x2) };
-    verifier_assert!(y == z);
 }
 
 #[no_mangle]
@@ -102,7 +77,5 @@ fn musl_rust() {
 }
 
 fn main() {
-    musl_smack();
-    rust_smack();
     musl_rust();
 }

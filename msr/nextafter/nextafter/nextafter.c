@@ -1,4 +1,4 @@
-#include "../../internal/libm.h"
+#include "../../../internal/libm.h"
 
 double musl_nextafter(double x, double y)
 {
@@ -29,3 +29,4 @@ double musl_nextafter(double x, double y)
 		FORCE_EVAL(x*x + ux.f*ux.f);
 	return ux.f;
 }
+
