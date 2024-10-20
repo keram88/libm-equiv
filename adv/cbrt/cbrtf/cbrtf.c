@@ -31,8 +31,8 @@ float musl_cbrtf(float x)
 	double r,T;
 	union {float f; uint32_t i;} u = {x};
 	uint32_t hx = u.i & 0x7fffffff;
-	__VERIFIER_equiv_store_unsigned_int(u.i, 0);
-	__VERIFIER_equiv_store_unsigned_int(hx, 1);
+	__VERIFIER_equiv_store_unsigned_int(u.i);
+	__VERIFIER_equiv_store_unsigned_int(hx);
 	if (hx >= 0x7f800000)  /* cbrt(NaN,INF) is itself */
 		return x + x;
 
@@ -41,16 +41,16 @@ float musl_cbrtf(float x)
 		if (hx == 0)
 			return x;  /* cbrt(+-0) is itself */
 		u.f = x*0x1p24f;
-		__VERIFIER_equiv_store_unsigned_int(u.i, 2);
+		__VERIFIER_equiv_store_unsigned_int(u.i);
 		hx = u.i & 0x7fffffff;
-		__VERIFIER_equiv_store_unsigned_int(hx, 3);
+		__VERIFIER_equiv_store_unsigned_int(hx);
 		hx = hx/3 + B2;
 	} else
 		hx = hx/3 + B1;
-	__VERIFIER_equiv_store_unsigned_int(hx, 4);
+	__VERIFIER_equiv_store_unsigned_int(hx);
 	u.i &= 0x80000000;
 	u.i |= hx;
-	__VERIFIER_equiv_store_unsigned_int(u.i, 5);
+	__VERIFIER_equiv_store_unsigned_int(u.i);
 
 	/*
 	 * First step Newton iteration (solving t*t-x/t == 0) to 16 bits.  In
@@ -58,19 +58,19 @@ float musl_cbrtf(float x)
 	 * without causing overflow or underflow.
 	 */
 	T = u.f;
-	__VERIFIER_equiv_store_double(T, 6);
+	__VERIFIER_equiv_store_double(T);
 	r = T*T*T;
-	__VERIFIER_equiv_store_double(r, 7);
+	__VERIFIER_equiv_store_double(r);
 	T = T*((double)x+x+r)/(x+r+r);
-	__VERIFIER_equiv_store_double(T, 8);
+	__VERIFIER_equiv_store_double(T);
 	/*
 	 * Second step Newton iteration to 47 bits.  In double precision for
 	 * efficiency and accuracy.
 	 */
 	r = T*T*T;
-	__VERIFIER_equiv_store_double(r, 9);
+	__VERIFIER_equiv_store_double(r);
 	T = T*((double)x+x+r)/(x+r+r);
-	__VERIFIER_equiv_store_double(T, 10);
+	__VERIFIER_equiv_store_double(T);
 
 	/* rounding to 24 bits is perfect in round-to-nearest mode */
 	return T;

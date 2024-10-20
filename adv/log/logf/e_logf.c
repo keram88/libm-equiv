@@ -34,15 +34,15 @@ float bsd_logf(float x)
 	int k;
 
 	ix = u.i;
-	__VERIFIER_equiv_store_unsigned_int(ix, 0);
+	__VERIFIER_equiv_store_unsigned_int(ix);
 	k = 0;
 	if (ix < 0x00800000 || ix>>31) {  /* x < 2**-126  */
 		if (ix<<1 == 0) {
-			__VERIFIER_equiv_store_float(-1/(x*x), 1);
+			__VERIFIER_equiv_store_float(-1/(x*x));
 			return -1/(x*x);  /* log(+-0)=-inf */
 		}
 		if (ix>>31) {
-			__VERIFIER_equiv_store_float((x-x)/0.0f, 2);
+			__VERIFIER_equiv_store_float((x-x)/0.0f);
 			return (x-x)/0.0f; /* log(-#) = NaN */
 		}
 		/* subnormal number, scale up x */
@@ -50,7 +50,7 @@ float bsd_logf(float x)
 		x *= 0x1p25f;
 		u.f = x;
 		ix = u.i;
-		__VERIFIER_equiv_store_unsigned_int(ix, 3);
+		__VERIFIER_equiv_store_unsigned_int(ix);
 	} else if (ix >= 0x7f800000) {
 		return x;
 	} else if (ix == 0x3f800000)
@@ -62,18 +62,18 @@ float bsd_logf(float x)
 	ix = (ix&0x007fffff) + 0x3f3504f3;
 	u.i = ix;
 	x = u.f;
-	__VERIFIER_equiv_store_float(x, 4);
+	__VERIFIER_equiv_store_float(x);
 
 	f = x - 1.0f;
 	s = f/(2.0f + f);
 	z = s*s;
 	w = z*z;
-	__VERIFIER_equiv_store_float(w, 6);
+	__VERIFIER_equiv_store_float(w);
 	t1= w*(Lg2+w*Lg4);
 	t2= z*(Lg1+w*Lg3);
 	R = t2 + t1;
 	hfsq = 0.5f*f*f;
 	dk = k;
-	__VERIFIER_equiv_store_float(s*(hfsq+R) + dk*ln2_lo - hfsq + f + dk*ln2_hi, 5);
+	__VERIFIER_equiv_store_float(s*(hfsq+R) + dk*ln2_lo - hfsq + f + dk*ln2_hi);
 	return s*(hfsq+R) + dk*ln2_lo - hfsq + f + dk*ln2_hi;
 }

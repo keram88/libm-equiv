@@ -39,12 +39,12 @@ __kernel_cosdf(double x)
 
 	/* Try to optimize for parallel evaluation as in k_tanf.c. */
 	z = x*x;
-	__VERIFIER_equiv_store_double(z, 0);
+	__VERIFIER_equiv_store_double(z);
 	w = z*z;
-	__VERIFIER_equiv_store_double(w, 1);
+	__VERIFIER_equiv_store_double(w);
 	r = C2+z*C3;
-	__VERIFIER_equiv_store_double(r, 2);
-	__VERIFIER_equiv_store_double(((one+z*C0) + w*C1) + (w*z)*r, 3);
-	__VERIFIER_equiv_store_float(((one+z*C0) + w*C1) + (w*z)*r, 4);
+	__VERIFIER_equiv_store_double(r);
+	__VERIFIER_equiv_store_double(((one+z*C0) + w*C1) + (w*z)*r);
+	__VERIFIER_equiv_store_float(((one+z*C0) + w*C1) + (w*z)*r);
 	return ((one+z*C0) + w*C1) + (w*z)*r;
 }

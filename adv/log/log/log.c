@@ -83,7 +83,7 @@ double musl_log(double x)
 	int k;
 
 	hx = u.i>>32;
-    __VERIFIER_equiv_store_unsigned_int(hx, 0);
+    __VERIFIER_equiv_store_unsigned_int(hx);
 	k = 0;
 	if (hx < 0x00100000 || hx>>31) {
 		if (u.i<<1 == 0)
@@ -95,7 +95,7 @@ double musl_log(double x)
 		x *= 0x1p54;
 		u.f = x;
 		hx = u.i>>32;
-        __VERIFIER_equiv_store_unsigned_int(hx, 1);
+        __VERIFIER_equiv_store_unsigned_int(hx);
 	} else if (hx >= 0x7ff00000) {
 		return x;
 	} else if (hx == 0x3ff00000 && u.i<<32 == 0)
@@ -107,21 +107,21 @@ double musl_log(double x)
 	hx = (hx&0x000fffff) + 0x3fe6a09e;
 	u.i = (uint64_t)hx<<32 | (u.i&0xffffffff);
 	x = u.f;
-    __VERIFIER_equiv_store_double(x, 2);
+    __VERIFIER_equiv_store_double(x);
 
 	f = x - 1.0;
 	hfsq = 0.5*f*f;
 	s = f/(2.0+f);
 	z = s*s;
 	w = z*z;
-    __VERIFIER_equiv_store_double(w, 4);
+    __VERIFIER_equiv_store_double(w);
 	t1 = w*(Lg2+w*(Lg4+w*Lg6));
-    __VERIFIER_equiv_store_double(t1, 6);
+    __VERIFIER_equiv_store_double(t1);
 	t2 = z*(Lg1+w*(Lg3+w*(Lg5+w*Lg7)));
-    __VERIFIER_equiv_store_double(t2, 5);
+    __VERIFIER_equiv_store_double(t2);
 	R = t2 + t1;
-    __VERIFIER_equiv_store_double(R, 7);
+    __VERIFIER_equiv_store_double(R);
 	dk = k;
-    __VERIFIER_equiv_store_double(s*(hfsq+R) + dk*ln2_lo - hfsq + f + dk*ln2_hi, 3);
+    __VERIFIER_equiv_store_double(s*(hfsq+R) + dk*ln2_lo - hfsq + f + dk*ln2_hi);
 	return s*(hfsq+R) + dk*ln2_lo - hfsq + f + dk*ln2_hi;
 }

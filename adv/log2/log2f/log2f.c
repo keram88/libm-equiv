@@ -56,27 +56,27 @@ float musl_log2f(float x)
 	ix = (ix&0x007fffff) + 0x3f3504f3;
 	u.i = ix;
 	x = u.f;
-	__VERIFIER_equiv_store_float(x, 0);
+	__VERIFIER_equiv_store_float(x);
 
 	f = x - 1.0f;
 	s = f/(2.0f + f);
 	z = s*s;
 	w = z*z;
-	__VERIFIER_equiv_store_float(w, 1);
+	__VERIFIER_equiv_store_float(w);
 
 	t1= w*(Lg2+w*Lg4);
 	t2= z*(Lg1+w*Lg3);
 	R = t2 + t1;
 	hfsq = 0.5f*f*f;
-	__VERIFIER_equiv_store_float(hfsq, 3); // B/Z3: 4m25s
+	__VERIFIER_equiv_store_float(hfsq); // B/Z3: 4m25s
 
 	hi = f - hfsq;
 	u.f = hi;
 	u.i &= 0xfffff000;
 	hi = u.f;
-	__VERIFIER_equiv_store_float(hi, 4);
+	__VERIFIER_equiv_store_float(hi);
 	lo = f - hi - hfsq + s*(hfsq+R);
-	__VERIFIER_equiv_store_float(lo, 5);
-	__VERIFIER_equiv_store_float((lo+hi)*ivln2lo + lo*ivln2hi + hi*ivln2hi + k, 2);
+	__VERIFIER_equiv_store_float(lo);
+	__VERIFIER_equiv_store_float((lo+hi)*ivln2lo + lo*ivln2hi + hi*ivln2hi + k);
 	return (lo+hi)*ivln2lo + lo*ivln2hi + hi*ivln2hi + k;
 }

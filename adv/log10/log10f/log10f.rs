@@ -76,28 +76,28 @@ pub fn log10f(mut x: f32) -> f32 {
     ix = (ix & 0x007fffff) + 0x3f3504f3;
     ui = ix;
     x = f32::from_bits(ui);
-    verifier_equiv_check_f32(x, 0);
+    verifier_equiv_check_f32(x);
     f = x - 1.0;
     s = f / (2.0 + f);
     z = s * s;
     w = z * z;
-    verifier_equiv_check_f32(w, 1);
+    verifier_equiv_check_f32(w);
     t1 = w * (LG2 + w * LG4);
     t2 = z * (LG1 + w * LG3);
     r = t2 + t1;
     hfsq = 0.5 * f * f;
-    verifier_equiv_check_f32(hfsq, 4);
+    verifier_equiv_check_f32(hfsq);
 
     hi = f - hfsq;
-    verifier_equiv_check_f32(hi, 5);
+    verifier_equiv_check_f32(hi);
     ui = hi.to_bits();
     ui &= 0xfffff000;
     hi = f32::from_bits(ui);
-    verifier_equiv_check_f32(hi, 6);
+    verifier_equiv_check_f32(hi);
     lo = f - hi - hfsq + s * (hfsq + r);
-    verifier_equiv_check_f32(lo, 3);
+    verifier_equiv_check_f32(lo);
     dk = k as f32;
-    verifier_equiv_check_f32(dk * LOG10_2LO + (lo + hi) * IVLN10LO + lo * IVLN10HI + hi * IVLN10HI + dk * LOG10_2HI, 2);
+    verifier_equiv_check_f32(dk * LOG10_2LO + (lo + hi) * IVLN10LO + lo * IVLN10HI + hi * IVLN10HI + dk * LOG10_2HI);
     dk * LOG10_2LO + (lo + hi) * IVLN10LO + lo * IVLN10HI + hi * IVLN10HI + dk * LOG10_2HI
 }
 

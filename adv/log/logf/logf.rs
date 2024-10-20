@@ -29,24 +29,24 @@ pub fn logf(mut x: f32) -> f32 {
     let x1p25 = f32::from_bits(0x4c000000); // 0x1p25f === 2 ^ 25
 
     let mut ix = x.to_bits();
-    verifier_equiv_check_u32(ix, 0);
+    verifier_equiv_check_u32(ix);
     let mut k = 0i32;
 
     if (ix < 0x00800000) || ((ix >> 31) != 0) {
         /* x < 2**-126  */
         if ix << 1 == 0 {
-            verifier_equiv_check_f32(-1./(x*x), 1);
+            verifier_equiv_check_f32(-1./(x*x));
             return -1. / (x * x); /* log(+-0)=-inf */
         }
         if (ix >> 31) != 0 {
-            verifier_equiv_check_f32((x - x) / 0., 2);
+            verifier_equiv_check_f32((x - x) / 0.);
             return (x - x) / 0.; /* log(-#) = NaN */
         }
         /* subnormal number, scale up x */
         k -= 25;
         x *= x1p25;
         ix = x.to_bits();
-        verifier_equiv_check_u32(ix, 3);
+        verifier_equiv_check_u32(ix);
     } else if ix >= 0x7f800000 {
         return x;
     } else if ix == 0x3f800000 {
@@ -58,19 +58,19 @@ pub fn logf(mut x: f32) -> f32 {
     k += ((ix >> 23) as i32) - 0x7f;
     ix = (ix & 0x007fffff) + 0x3f3504f3;
     x = f32::from_bits(ix);
-    verifier_equiv_check_f32(x, 4);
+    verifier_equiv_check_f32(x);
 
     let f = x - 1.;
     let s = f / (2. + f);
     let z = s * s;
     let w = z * z;
-    verifier_equiv_check_f32(w, 6);
+    verifier_equiv_check_f32(w);
     let t1 = w * (LG2 + w * LG4);
     let t2 = z * (LG1 + w * LG3);
     let r = t2 + t1;
     let hfsq = 0.5 * f * f;
     let dk = k as f32;
-    verifier_equiv_check_f32(s * (hfsq + r) + dk * LN2_LO - hfsq + f + dk * LN2_HI, 5);
+    verifier_equiv_check_f32(s * (hfsq + r) + dk * LN2_LO - hfsq + f + dk * LN2_HI);
     s * (hfsq + r) + dk * LN2_LO - hfsq + f + dk * LN2_HI
 }
 

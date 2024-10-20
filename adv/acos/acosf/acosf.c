@@ -40,9 +40,9 @@ float musl_acosf(float x)
 	uint32_t hx,ix;
 
 	GET_FLOAT_WORD(hx, x);
-	__VERIFIER_equiv_store_unsigned_int(hx, 0);
+	__VERIFIER_equiv_store_unsigned_int(hx);
 	ix = hx & 0x7fffffff;
-	__VERIFIER_equiv_store_unsigned_int(ix, 1);
+	__VERIFIER_equiv_store_unsigned_int(ix);
 	/* |x| >= 1 or nan */
 	if (ix >= 0x3f800000) {
 		if (ix == 0x3f800000) {
@@ -56,11 +56,11 @@ float musl_acosf(float x)
 	if (ix < 0x3f000000) {
 		if (ix <= 0x32800000) /* |x| < 2**-26 */
 			return pio2_hi + 0x1p-120f;
-		__VERIFIER_equiv_store_float(R(x*x), 2);
-		__VERIFIER_equiv_store_float(x*R(x*x), 3);
-		__VERIFIER_equiv_store_float(pio2_lo-x*R(x*x), 4);
-		__VERIFIER_equiv_store_float(x - (pio2_lo-x*R(x*x)), 5);
-		__VERIFIER_equiv_store_float(pio2_hi - (x - (pio2_lo-x*R(x*x))), 6);
+		__VERIFIER_equiv_store_float(R(x*x));
+		__VERIFIER_equiv_store_float(x*R(x*x));
+		__VERIFIER_equiv_store_float(pio2_lo-x*R(x*x));
+		__VERIFIER_equiv_store_float(x - (pio2_lo-x*R(x*x)));
+		__VERIFIER_equiv_store_float(pio2_hi - (x - (pio2_lo-x*R(x*x))));
 		return pio2_hi - (x - (pio2_lo-x*R(x*x)));
 	}
 	/* x < -0.5 */
@@ -68,26 +68,26 @@ float musl_acosf(float x)
 		z = (1+x)*0.5f;
 		s = dummy_sqrtf(z);
 		w = R(z)*s-pio2_lo;
-		__VERIFIER_equiv_store_float(s+w, 8);
-		__VERIFIER_equiv_store_float(pio2_hi-(s+w), 9);
-		__VERIFIER_equiv_store_float(2*(pio2_hi - (s+w)), 10);
+		__VERIFIER_equiv_store_float(s+w);
+		__VERIFIER_equiv_store_float(pio2_hi-(s+w));
+		__VERIFIER_equiv_store_float(2*(pio2_hi - (s+w)));
 		return 2*(pio2_hi - (s+w));
 	}
 	/* x > 0.5 */
 	z = (1-x)*0.5f;
 	s = dummy_sqrtf(z);
-	__VERIFIER_equiv_store_float(s, 11);
+	__VERIFIER_equiv_store_float(s);
 	GET_FLOAT_WORD(hx,s);
-	__VERIFIER_equiv_store_unsigned_int(hx, 12);
+	__VERIFIER_equiv_store_unsigned_int(hx);
 	SET_FLOAT_WORD(df,hx&0xfffff000);
-	__VERIFIER_equiv_store_float(df, 13);
-	__VERIFIER_equiv_store_float(z-df*df, 14);
-	__VERIFIER_equiv_store_float(s+df, 15);
+	__VERIFIER_equiv_store_float(df);
+	__VERIFIER_equiv_store_float(z-df*df);
+	__VERIFIER_equiv_store_float(s+df);
 	c = (z-df*df)/(s+df);
-	__VERIFIER_equiv_store_float(c, 16);
-	__VERIFIER_equiv_store_float(R(z), 17);
-	__VERIFIER_equiv_store_float(R(z)*s, 18);
+	__VERIFIER_equiv_store_float(c);
+	__VERIFIER_equiv_store_float(R(z));
+	__VERIFIER_equiv_store_float(R(z)*s);
 	w = R(z)*s+c;
-	__VERIFIER_equiv_store_float(w, 19);
+	__VERIFIER_equiv_store_float(w);
 	return 2*(df+w);
 }

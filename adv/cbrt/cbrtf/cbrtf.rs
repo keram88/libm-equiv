@@ -37,9 +37,9 @@ pub fn rust_cbrtf(x: f32) -> f32 {
     let mut r: f64;
     let mut t: f64;
     let mut ui: u32 = x.to_bits();
-    verifier_equiv_check_u32(ui, 0);
+    verifier_equiv_check_u32(ui);
     let mut hx: u32 = ui & 0x7fffffff;
-    verifier_equiv_check_u32(hx, 1);
+    verifier_equiv_check_u32(hx);
     if hx >= 0x7f800000 {
         /* cbrt(NaN,INF) is itself */
         return x + x;
@@ -52,37 +52,37 @@ pub fn rust_cbrtf(x: f32) -> f32 {
             return x; /* cbrt(+-0) is itself */
         }
         ui = (x * x1p24).to_bits();
-        verifier_equiv_check_u32(ui, 2);
+        verifier_equiv_check_u32(ui);
         hx = ui & 0x7fffffff;
-        verifier_equiv_check_u32(hx, 3);
+        verifier_equiv_check_u32(hx);
         hx = hx / 3 + B2;
         } else {
         hx = hx / 3 + B1;
     }
-    verifier_equiv_check_u32(hx, 4);
+    verifier_equiv_check_u32(hx);
     ui &= 0x80000000;
     ui |= hx;
-    verifier_equiv_check_u32(ui, 5);
+    verifier_equiv_check_u32(ui);
     /*
      * First step Newton iteration (solving t*t-x/t == 0) to 16 bits.  In
      * double precision so that its terms can be arranged for efficiency
      * without causing overflow or underflow.
      */
     t = f32::from_bits(ui) as f64;
-    verifier_equiv_check_f64(t, 6);
+    verifier_equiv_check_f64(t);
     r = t * t * t;
-    verifier_equiv_check_f64(r, 7);
+    verifier_equiv_check_f64(r);
     t = t * (x as f64 + x as f64 + r) / (x as f64 + r + r);
-    verifier_equiv_check_f64(t, 8);
+    verifier_equiv_check_f64(t);
 
     /*
      * Second step Newton iteration to 47 bits.  In double precision for
      * efficiency and accuracy.
      */
     r = t * t * t;
-    verifier_equiv_check_f64(r, 9);
+    verifier_equiv_check_f64(r);
     t = t * (x as f64 + x as f64 + r) / (x as f64 + r + r);
-    verifier_equiv_check_f64(t, 10);
+    verifier_equiv_check_f64(t);
 
     /* rounding to 24 bits is perfect in round-to-nearest mode */
     t as f32

@@ -41,7 +41,7 @@ __kernel_tandf(double x, int iy)
 	double z,r,w,s,t,u;
 
 	z	=  x*x;
-	__VERIFIER_equiv_store_double(z, 0);
+	__VERIFIER_equiv_store_double(z);
 	/*
 	 * Split up the polynomial into small independent terms to give
 	 * opportunities for parallel evaluation.  The chosen splitting is
@@ -57,18 +57,18 @@ __kernel_tandf(double x, int iy)
 	 * small terms were added from highest degree down.
 	 */
 	r = T[4]+z*T[5];
-	__VERIFIER_equiv_store_double(r, 1);
+	__VERIFIER_equiv_store_double(r);
 	t = T[2]+z*T[3];
-	__VERIFIER_equiv_store_double(t, 2);
+	__VERIFIER_equiv_store_double(t);
 	w = z*z;
-	__VERIFIER_equiv_store_double(w, 3);
+	__VERIFIER_equiv_store_double(w);
 	s = z*x;
-	__VERIFIER_equiv_store_double(s, 4);
+	__VERIFIER_equiv_store_double(s);
 	u = T[0]+z*T[1];
-	__VERIFIER_equiv_store_double(u, 5);
+	__VERIFIER_equiv_store_double(u);
 	r = (x+s*u)+(s*w)*(t+w*r);
-	__VERIFIER_equiv_store_double(r, 6);
-	__VERIFIER_equiv_store_double(-1.0/r, 7);
+	__VERIFIER_equiv_store_double(r);
+	__VERIFIER_equiv_store_double(-1.0/r);
 	if(iy==1) return r;
 	else return -1.0/r;
 }

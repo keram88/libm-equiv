@@ -27,13 +27,13 @@ const C3: f64 = 0.0000243904487962774090654; /*  0x199342e0ee5069.0p-68 */
 #[cfg_attr(all(test, assert_no_panic), no_panic::no_panic)]
 pub(crate) fn k_cosf(x: f64) -> f32 {
     let z = x * x;
-    verifier_equiv_check_f64(z, 0);
+    verifier_equiv_check_f64(z);
     let w = z * z;
-    verifier_equiv_check_f64(w, 1);
+    verifier_equiv_check_f64(w);
     let r = C2 + z * C3;
-    verifier_equiv_check_f64(r, 2);
-    verifier_equiv_check_f64((((1.0 + z * C0) + w * C1) + (w * z) * r), 3);
-    verifier_equiv_check_f32((((1.0 + z * C0) + w * C1) + (w * z) * r) as f32, 4);
+    verifier_equiv_check_f64(r);
+    verifier_equiv_check_f64((((1.0 + z * C0) + w * C1) + (w * z) * r));
+    verifier_equiv_check_f32((((1.0 + z * C0) + w * C1) + (w * z) * r) as f32);
     (((1.0 + z * C0) + w * C1) + (w * z) * r) as f32
 }
 

@@ -55,9 +55,9 @@ pub fn acosf(x: f32) -> f32 {
     let s: f32;
 
     let mut hx = x.to_bits();
-    verifier_equiv_check_u32(hx, 0);
+    verifier_equiv_check_u32(hx);
     let ix = hx & 0x7fffffff;
-    verifier_equiv_check_u32(ix, 1);
+    verifier_equiv_check_u32(ix);
     /* |x| >= 1 or nan */
     if ix >= 0x3f800000 {      
         if ix == 0x3f800000 {
@@ -74,11 +74,11 @@ pub fn acosf(x: f32) -> f32 {
             /* |x| < 2**-26 */
             return PIO2_HI + x1p_120;
         }
-        verifier_equiv_check_f32(r(x*x), 2);
-        verifier_equiv_check_f32(x*r(x*x), 3);
-        verifier_equiv_check_f32(PIO2_LO - x*r(x*x), 4);
-        verifier_equiv_check_f32(x-(PIO2_LO - x*r(x*x)), 5);
-        verifier_equiv_check_f32(PIO2_HI-(x-(PIO2_LO - x*r(x*x))), 6);
+        verifier_equiv_check_f32(r(x*x));
+        verifier_equiv_check_f32(x*r(x*x));
+        verifier_equiv_check_f32(PIO2_LO - x*r(x*x));
+        verifier_equiv_check_f32(x-(PIO2_LO - x*r(x*x)));
+        verifier_equiv_check_f32(PIO2_HI-(x-(PIO2_LO - x*r(x*x))));
         return PIO2_HI - (x - (PIO2_LO - x * r(x * x)));
     }
     /* x < -0.5 */
@@ -86,27 +86,27 @@ pub fn acosf(x: f32) -> f32 {
         z = (1. + x) * 0.5;
         s = sqrtf(z);
         w = r(z) * s - PIO2_LO;
-        verifier_equiv_check_f32(s+w, 8);
-        verifier_equiv_check_f32(PIO2_HI-(s+w), 9);
-        verifier_equiv_check_f32(2. * (PIO2_HI-(s+w)), 10);
+        verifier_equiv_check_f32(s+w);
+        verifier_equiv_check_f32(PIO2_HI-(s+w));
+        verifier_equiv_check_f32(2. * (PIO2_HI-(s+w)));
         return 2. * (PIO2_HI - (s + w));
     }
     /* x > 0.5 */
     z = (1. - x) * 0.5;
     s = sqrtf(z);
-    verifier_equiv_check_f32(s, 11);
+    verifier_equiv_check_f32(s);
     hx = s.to_bits();
-    verifier_equiv_check_u32(hx, 12);
+    verifier_equiv_check_u32(hx);
     let df = f32::from_bits(hx & 0xfffff000);
-    verifier_equiv_check_f32(df, 13);
-    verifier_equiv_check_f32(z - df*df, 14);
-    verifier_equiv_check_f32(s + df, 15);
+    verifier_equiv_check_f32(df);
+    verifier_equiv_check_f32(z - df*df);
+    verifier_equiv_check_f32(s + df);
     let c = (z - df * df) / (s + df);
-    verifier_equiv_check_f32(c, 16);
-    verifier_equiv_check_f32(r(z), 17);
-    verifier_equiv_check_f32(r(z)*s, 18);
+    verifier_equiv_check_f32(c);
+    verifier_equiv_check_f32(r(z));
+    verifier_equiv_check_f32(r(z)*s);
     w = r(z) * s + c;
-    verifier_equiv_check_f32(w, 19);
+    verifier_equiv_check_f32(w);
     2. * (df + w)
 }
 

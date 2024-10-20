@@ -80,7 +80,7 @@ pub fn log(mut x: f64) -> f64 {
 
     let mut ui = x.to_bits();
     let mut hx: u32 = (ui >> 32) as u32;
-    verifier_equiv_check_u32(hx, 0);
+    verifier_equiv_check_u32(hx);
     let mut k: i32 = 0;
 
     if (hx < 0x00100000) || ((hx >> 31) != 0) {
@@ -96,7 +96,7 @@ pub fn log(mut x: f64) -> f64 {
         x *= x1p54;
         ui = x.to_bits();
         hx = (ui >> 32) as u32;
-        verifier_equiv_check_u32(hx, 1);
+        verifier_equiv_check_u32(hx);
     } else if hx >= 0x7ff00000 {
         return x;
     } else if hx == 0x3ff00000 && ui << 32 == 0 {
@@ -109,22 +109,22 @@ pub fn log(mut x: f64) -> f64 {
     hx = (hx & 0x000fffff) + 0x3fe6a09e;
     ui = ((hx as u64) << 32) | (ui & 0xffffffff);
     x = f64::from_bits(ui);
-    verifier_equiv_check_f64(x, 2);
+    verifier_equiv_check_f64(x);
 
     let f: f64 = x - 1.0;
     let hfsq: f64 = 0.5 * f * f;
     let s: f64 = f / (2.0 + f);
     let z: f64 = s * s;
     let w: f64 = z * z;
-    verifier_equiv_check_f64(w, 4); // 10m19s
+    verifier_equiv_check_f64(w);
     let t1: f64 = w * (LG2 + w * (LG4 + w * LG6));
-    verifier_equiv_check_f64(t1,6); // 14m49s
+    verifier_equiv_check_f64(t1);
     let t2: f64 = z * (LG1 + w * (LG3 + w * (LG5 + w * LG7)));
-    verifier_equiv_check_f64(t2, 5); // 16m26s
+    verifier_equiv_check_f64(t2);
     let r: f64 = t2 + t1;
-    verifier_equiv_check_f64(r,7); // 30m52s
+    verifier_equiv_check_f64(r);
     let dk: f64 = k as f64;
-    verifier_equiv_check_f64(s * (hfsq + r) + dk * LN2_LO - hfsq + f + dk * LN2_HI, 3); // 46m46s
+    verifier_equiv_check_f64(s * (hfsq + r) + dk * LN2_LO - hfsq + f + dk * LN2_HI);
     s * (hfsq + r) + dk * LN2_LO - hfsq + f + dk * LN2_HI
 }
 

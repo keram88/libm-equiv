@@ -69,15 +69,15 @@ __kernel_cos(double x, double y)
 	double hz,z,r,w;
 
 	z  = x*x;
-	__VERIFIER_equiv_store_double(z, 0);
+	__VERIFIER_equiv_store_double(z);
 	w  = z*z;
-	__VERIFIER_equiv_store_double(w, 1);
+	__VERIFIER_equiv_store_double(w);
 	r  = z*(C1+z*(C2+z*C3)) + w*w*(C4+z*(C5+z*C6));
-	__VERIFIER_equiv_store_double(r, 2);
+	__VERIFIER_equiv_store_double(r);
 	hz = 0.5*z;
-	__VERIFIER_equiv_store_double(hz, 3);
+	__VERIFIER_equiv_store_double(hz);
 	w  = one-hz;
-	__VERIFIER_equiv_store_double(w, 4);
-	__VERIFIER_equiv_store_double(w + (((one-w)-hz) + (z*r-x*y)), 5);
+	__VERIFIER_equiv_store_double(w);
+	__VERIFIER_equiv_store_double(w + (((one-w)-hz) + (z*r-x*y)));
 	return w + (((one-w)-hz) + (z*r-x*y));
 }
