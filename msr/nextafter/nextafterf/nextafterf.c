@@ -1,4 +1,4 @@
-#include "../../../internal/libm.h"
+#include "../../../include/libm.h"
 
 float musl_nextafterf(float x, float y)
 {

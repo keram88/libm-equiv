@@ -1,4 +1,4 @@
-#include "../../../internal/libm.h"
+#include "../../../include/libm.h"
 
 #if FLT_EVAL_METHOD==0
 #define EPS FLT_EPSILON

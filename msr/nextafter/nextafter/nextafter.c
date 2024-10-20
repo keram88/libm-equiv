@@ -1,4 +1,4 @@
-#include "../../../internal/libm.h"
+#include "../../../include/libm.h"
 
 double musl_nextafter(double x, double y)
 {

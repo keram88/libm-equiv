@@ -1,4 +1,4 @@
-#include "../../../internal/libm.h"
+#include "../../../include/libm.h"
 
 double musl_copysign(double x, double y) {
 	union {double f; uint64_t i;} ux={x}, uy={y};

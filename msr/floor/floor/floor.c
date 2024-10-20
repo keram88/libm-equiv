@@ -1,4 +1,4 @@
-#include "../../../internal/libm.h"
+#include "../../../include/libm.h"
 #include "smack.h"
 
 #if FLT_EVAL_METHOD==0 || FLT_EVAL_METHOD==1

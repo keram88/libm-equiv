@@ -185,14 +185,16 @@ def get_extensions(languages):
     return extensions
 
 
-def get_tests(folder):
-    tests = []
-    for root, dirs, files in os.walk(folder):
-        for file in files:
-            if file == 'test.json':
-                tests.append(os.path.join(root, file))
-    tests.sort()
-    return tests
+def get_tests(dirs):
+    tests = set()
+    for dir in dirs:
+        for root, _, files in os.walk(dir):
+            for file in files:
+                if file == 'test.json':
+                    tests.add(os.path.join(root, file))
+    ltests = list(tests)
+    ltests.sort()
+    return ltests
 
 def get_sources(test_cfg):
     folder = os.path.dirname(test_cfg)
@@ -266,6 +268,7 @@ def main():
     parser.add_argument(
         '--dir',
         action='store',
+        nargs='+',
         default=None,
         dest='dir',
         type=str
@@ -279,9 +282,9 @@ def main():
     )
     args = parser.parse_args()
     if args.dir is None:
-        script_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
+        script_directory = [os.path.dirname(os.path.abspath(sys.argv[0]))]
     else:
-        script_directory = os.path.abspath(args.dir)
+        script_directory = list(map(os.path.abspath, args.dir))
     tests = get_tests(script_directory)
 
     verifiers = get_verifiers(args.verifiers)

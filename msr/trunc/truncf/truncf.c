@@ -1,4 +1,4 @@
-#include "../../../internal/libm.h"
+#include "../../../include/libm.h"
 #include "smack.h"
 
 float musl_truncf(float x)

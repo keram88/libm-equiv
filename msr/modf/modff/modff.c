@@ -1,4 +1,4 @@
-#include "../../../internal/libm.h"
+#include "../../../include/libm.h"
 
 float musl_modff(float x, float *iptr)
 {
