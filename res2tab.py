@@ -7,12 +7,21 @@ from pprint import pprint
 def verif_name(verifier: str, solver: str):
     return verifier.capitalize() + "/" + solver.upper()
 
-def status(res):
+def get_status(res):
     if any(map(lambda x: x[0] == 'VERIFIED', res.values())):
         return 'Equivalent'
     if any(map(lambda x: x[0] == 'FAILED', res.values())):
         return 'Error'
     return 'Unknown'
+
+def get_time(res):
+    if res[0] == 'TIMEOUT':
+        return 'TO'
+    time = float(res[1])
+    stddev = float(res[2])
+
+    # return "{:.1f}$\pm${:.2f}s".format(time, stddev)
+    return "{:.1f}±{:.2f}s".format(time, stddev)
 
 rawres = []
 with open(sys.argv[1], 'r') as f:
@@ -37,4 +46,4 @@ solvers = sorted(solvers)
 print(" & ".join(['Function Name', 'Status'] + solvers))
 
 for k in sorted(res.keys()):
-    print(" & ".join([k, status(res[k])] + [res[k][s][1]+'$\pm$'+res[k][s][2] for s in solvers]))
+    print(" & ".join([k, get_status(res[k])] + [get_time(res[k][s]) for s in solvers]))
