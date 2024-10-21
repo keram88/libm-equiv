@@ -1,0 +1,7 @@
+#! /usr/bin/bash
+
+THREADS=${THREADS:-4}
+
+echo "musl-SMACK:"
+./regtest.py --threads $THREADS --dir msr --verifiers all --entry-point musl-smack > musl-smack.csv
+./res2tab.py musl-smack.csv

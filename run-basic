@@ -1,0 +1,7 @@
+#! /usr/bin/bash
+
+THREADS=${THREADS:-4}
+
+echo "Basic:"
+./regtest.py --threads $THREADS --dir basic msr --verifiers all > basic.csv
+./res2tab.py basic.csv
