@@ -1,5 +1,5 @@
 #include <limits.h>
-#include "../../internal/libm.h"
+#include "../../../include/libm.h"
 
 #define FP_ILOGBNAN (-1-0x7fffffff)
 #define FP_ILOGB0 FP_ILOGBNAN
