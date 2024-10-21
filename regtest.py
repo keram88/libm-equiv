@@ -280,6 +280,13 @@ def main():
         dest='entry_point',
         type=str
     )
+    parser.add_argument(
+        '--time-limit',
+        action='store',
+        default=0,
+        dest='time_limit',
+        type=int
+    )
     args = parser.parse_args()
     if args.dir is None:
         script_directory = [os.path.dirname(os.path.abspath(sys.argv[0]))]
@@ -317,7 +324,7 @@ def main():
             for verifier, solver in verifiers:
                 # build up the subprocess command
                 cmd = ['smack'] + test_files
-                cmd += ['--time-limit', str(meta['time-limit'])]
+                cmd += ['--time-limit', str(args.time_limit if args.time_limit > 0 else meta['time-limit'])]
                 cmd += ['--unroll', str(meta['unroll'])]
                 cmd += ['--float']
                 if meta['bv']:
