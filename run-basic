@@ -1,7 +1,10 @@
 #! /usr/bin/bash
 
-THREADS=${THREADS:-4}
+export THREADS=${THREADS:-4}
+export RUNS=${RUNS:-5}
+export TIMELIMIT=${TIMELIMIT:-0}
 
-echo "Basic:"
-./regtest.py --threads $THREADS --dir basic msr --verifiers all > basic.csv
-./res2tab.py basic.csv
+export DIRS="basic msr"
+export NAME="basic"
+
+./runner

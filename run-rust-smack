@@ -1,7 +1,12 @@
 #! /usr/bin/bash
 
-THREADS=${THREADS:-4}
+export THREADS=${THREADS:-4}
+export RUNS=${RUNS:-5}
+export TIMELIMIT=${TIMELIMIT:-0}
 
-echo "musl-SMACK:"
-./regtest.py --threads $THREADS --dir msr --verifiers all --entry-point rust-smack > rust-smack.csv
-./res2tab.py rust-smack.csv
+export DIRS="msr"
+export NAME="rust-smack"
+
+export ENTRY="--entry-point rust_smack"
+
+./runner

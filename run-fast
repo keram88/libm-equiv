@@ -1,0 +1,10 @@
+#! /usr/bin/bash
+
+export THREADS=${THREADS:-4}
+export RUNS=${RUNS:-5}
+export TIMELIMIT=${TIMELIMIT:-0}
+
+export DIRS="msr/copysign msr/fabs basic/ilogb"
+export NAME="fast"
+
+./runner

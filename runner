@@ -1,0 +1,9 @@
+#! /usr/bin/bash
+
+
+
+echo Running $NAME:
+echo ./regtest.py --threads $THREADS --dir $DIRS --verifiers all --runs $RUNS --time-limit $TIMELIMIT $ENTRY
+./regtest.py --threads $THREADS --dir $DIRS --verifiers all --runs $RUNS --time-limit $TIMELIMIT $ENTRY > $NAME.csv
+./res2tab.py $NAME.csv > $NAME.tab
+cat $NAME.tab
